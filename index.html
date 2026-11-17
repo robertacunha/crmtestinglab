@@ -1,0 +1,422 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>B2B CRM Testing Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,400..900&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Spline+Sans+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: method and sample check on the left rail, eight-round test map as the main column, learning log below. Same tokens as the Partner Campaign Desk. */
+:root{
+  --bg:#ECEEF1; --surface:#FAFBFC; --surface2:#E1E5EA; --ink:#141820; --muted:#545C66; --line:#CBD1D9; --chip:#E1E5EA;
+  --accent:#C22770; --accent-text:#A11E5C; --accent-ink:#FFFFFF; --accent-soft:#F7DDE9;
+  --ok:#2C7650; --ok-soft:#E1EFE6; --warn:#8F580B; --warn-soft:#F6EAD3; --crit:#AE3434; --crit-soft:#F5DFDF;
+  --f-display:"Anybody","Arial Narrow",Impact,sans-serif;
+  --f-body:"Public Sans","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"Spline Sans Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1217; --surface:#161B22; --surface2:#1D242D; --ink:#E6EAF0; --muted:#9BA5B1; --line:#2A323C; --chip:#1D242D;
+  --accent:#EE76AE; --accent-text:#F59AC5; --accent-ink:#0F1217; --accent-soft:#3A1E2C;
+  --ok:#72C79A; --ok-soft:#18291F; --warn:#E5AD52; --warn-soft:#30261A; --crit:#EF8383; --crit-soft:#341C1E; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1217; --surface:#161B22; --surface2:#1D242D; --ink:#E6EAF0; --muted:#9BA5B1; --line:#2A323C; --chip:#1D242D;
+  --accent:#EE76AE; --accent-text:#F59AC5; --accent-ink:#0F1217; --accent-soft:#3A1E2C;
+  --ok:#72C79A; --ok-soft:#18291F; --warn:#E5AD52; --warn-soft:#30261A; --crit:#EF8383; --crit-soft:#341C1E; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:20px 48px}
+.wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{text-wrap:balance;margin:0}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+a{color:var(--accent-text)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);padding-bottom:16px}
+header.top h1{font-family:var(--f-display);font-weight:400;font-size:clamp(34px,5vw,48px);line-height:1}
+header.top h1 em{color:var(--accent)}
+.forline{font-family:var(--f-display);font-weight:400;font-size:clamp(34px,5vw,48px);line-height:1;color:var(--ink);margin-top:4px}
+.forline .brand{color:var(--accent)}
+header.top p{margin:8px 0 0;color:var(--muted);max-width:64ch}
+.side{display:flex;flex-direction:column;gap:8px;min-width:0}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font:inherit;font-size:13.5px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 12px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.sister{font-size:13.5px;font-weight:600}
+.tagrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.byline{display:inline-block;border:1.5px solid var(--ink);border-radius:999px;padding:6px 16px;font-weight:700;font-size:14px;line-height:1.2}
+.themebtn{margin-left:auto;display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);border-radius:999px;padding:6px 14px;font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.themebtn:hover{border-color:var(--accent);color:var(--accent-text)}
+.themebtn .ti{width:14px;height:14px;border-radius:50%;border:1.5px solid currentColor;background:linear-gradient(90deg,currentColor 50%,transparent 50%)}
+
+.note{font-size:13px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:8px;padding:10px 12px}
+
+.grid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:920px){.grid{grid-template-columns:minmax(0,1fr)}}
+.rail{display:flex;flex-direction:column;gap:16px;min-width:0}
+@media (min-width:921px){.rail{position:sticky;top:calc(env(safe-area-inset-top, 0px) + 12px)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.panel h2{font-family:var(--f-display);font-weight:400;font-size:26px;line-height:1.1}
+.rules{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.rules li::marker{color:var(--accent-text);font-weight:700}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-size:12px;font-weight:600;color:var(--muted)}
+input[type=text],input[type=number],select,textarea{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%}
+input[type=number]{font-family:var(--f-mono)}
+textarea{resize:vertical;min-height:54px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:520px){.row4{grid-template-columns:1fr 1fr}}
+.mkin{display:grid;grid-template-columns:36px 1fr auto;gap:6px 10px;align-items:center;font-size:13.5px}
+.hint{font-size:12px;color:var(--muted)}
+.segdefs{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+.segdefs b{color:var(--ink)}
+.segnote{margin-top:4px;padding-top:6px;border-top:1px solid var(--line)}
+.src{display:block;font-size:12px;margin-bottom:2px}
+.mk{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;font-size:13.5px;align-items:center}
+.mk .bar{height:8px;background:var(--line);border-radius:999px;overflow:hidden}
+.mk .bar i{display:block;height:100%;background:var(--accent)}
+
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.crit{background:var(--crit-soft);color:var(--crit)} .pill.acc{background:var(--accent-soft);color:var(--accent-text)} .pill.mut{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.sum{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0}
+.sum b{display:block;font-size:22px;font-weight:600}
+.sum span{font-size:12.5px;color:var(--muted)}
+
+.map{display:flex;flex-direction:column;gap:14px;min-width:0}
+.round{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.round[data-status="done"]{border-color:var(--ok)}
+.rhead{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between}
+.rhead select{width:auto;min-width:120px}
+.rtitle{display:flex;align-items:baseline;gap:12px;min-width:0}
+.rnum{font-family:var(--f-display);font-size:34px;color:var(--accent);line-height:.9;min-width:30px}
+.rtitle h3{font-size:17px;font-weight:700}
+.rtitle .principle{font-size:12.5px;color:var(--muted)}
+.hyp{font-size:14px;margin:0;border-left:2px solid var(--accent);padding-left:10px}
+.variants{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:620px){.variants{grid-template-columns:1fr}}
+.var{border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
+.var .sendname{font-size:11px;color:var(--muted);word-break:break-all}
+.var .cellp{font-size:12.5px;color:var(--ink);font-weight:500}
+.var .cellp::before{content:"Principle: ";color:var(--muted);font-weight:400}
+.var .aw{color:var(--ok);text-transform:none;letter-spacing:0}
+.psy{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.plab{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-text);font-weight:500}
+.pval{font-size:14.5px;color:var(--ink);margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--chip);color:var(--ink);font-size:13px;padding:4px 10px;border-radius:6px}
+.flight{display:flex;flex-direction:column;gap:2px;padding:4px 2px}
+.flight p{margin:0;font-size:13.5px;color:var(--muted)}
+.learn{margin:0;font-size:14.5px}
+.learn b{color:var(--accent-text)}
+.var .tag{font-family:var(--f-mono);font-size:11.5px;font-weight:600;color:var(--accent-text)}
+.var textarea{background:var(--surface);min-height:84px}
+.stats{display:grid;grid-template-columns:110px 160px minmax(0,1fr);gap:10px;align-items:end}
+@media (max-width:520px){.stats{grid-template-columns:1fr 1fr}.stats .field:last-child{grid-column:span 2}}
+.lbl{font-size:12px;font-weight:600;color:var(--muted)}
+.feasbox{min-height:36px;display:flex;align-items:center}
+.explain{margin:0;font-size:13px;color:var(--muted)}
+.explain b{color:var(--ink);font-weight:600}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
+.meta b{color:var(--ink);font-weight:600}
+details.res summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--accent-text)}
+.resbox{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.verdict{font-size:14px;border-radius:8px;padding:9px 12px;background:var(--bg)}
+.verdict.win{background:var(--ok-soft)} .verdict.lose{background:var(--crit-soft)} .verdict.flat{background:var(--warn-soft)}
+.guard{font-size:12.5px;color:var(--muted)}
+
+table.log{width:100%;border-collapse:collapse;font-size:13.5px}
+table.log th,table.log td{text-align:left;padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+table.log th{font-size:12px;color:var(--muted);font-weight:600}
+.scroll{overflow-x:auto}
+footer.foot{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:6px}
+.btn{font:inherit;font-size:13px;font-weight:600;border-radius:8px;padding:7px 12px;cursor:pointer;border:1px solid var(--accent-text);background:transparent;color:var(--accent-text)}
+/* structured layer */
+body{font-size:15.5px}
+.wrap{gap:24px}
+header.top{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;align-items:start;border-bottom:2px solid var(--ink);padding-bottom:20px}
+header.top .eyebrow,.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-text);font-weight:500}
+header.top h1{font-family:var(--f-display);font-stretch:72%;font-weight:900;text-transform:uppercase;font-size:clamp(52px,8.5vw,108px);line-height:.84;letter-spacing:-.01em;margin-top:8px}
+header.top h1 span{display:block;color:var(--accent)}
+header.top p{font-size:17px;max-width:68ch;margin-top:12px}
+.side{gap:10px}
+.seg{gap:0;border:1.5px solid var(--ink);border-radius:4px;overflow:hidden;width:max-content;max-width:100%}
+.seg button{border:0;border-right:1.5px solid var(--ink);border-radius:0;background:transparent;font-size:13.5px;font-weight:600;padding:9px 14px}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+@media (max-width:760px){.seg{width:100%;flex-direction:column}.seg button{border-right:0;border-bottom:1.5px solid var(--ink);text-align:left}.seg button:last-child{border-bottom:0}}
+.summary{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.5fr) repeat(3,minmax(0,1fr));gap:0;background:var(--surface);border:1.5px solid var(--ink);border-radius:4px}
+.sum{border:0;border-right:1px solid var(--line);border-radius:0;background:transparent;padding:16px 18px;display:flex;flex-direction:column;gap:8px}
+.sum:last-child{border-right:0}
+.sum .k{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-text);font-weight:500}
+.sum .t{font-size:17px;font-weight:700;line-height:1.3;color:var(--ink)}
+.sum .n{color:var(--ink)}
+.sum .n{font-family:var(--f-display);font-stretch:72%;font-weight:900;font-size:44px;line-height:.9;font-variant-numeric:tabular-nums}
+.sum .n small{font-size:24px;color:var(--muted);font-weight:800}
+.sum .c{font-size:12.5px;color:var(--muted);line-height:1.4}
+.sum .bar{height:6px;background:var(--surface2);border-radius:0;overflow:hidden}
+.sum .bar i{display:block;height:100%;background:var(--accent)}
+@media (max-width:980px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.sum{border-bottom:1px solid var(--line)}.sum:nth-child(2n){border-right:0}.sum:first-child{grid-column:span 2;border-right:0}}
+@media (max-width:520px){.summary{grid-template-columns:minmax(0,1fr)}.sum,.sum:first-child{grid-column:auto;border-right:0}}
+.panel,.round{border-radius:4px;border-color:var(--line)}
+.panel h2{font-family:var(--f-display);font-stretch:72%;font-weight:850;text-transform:uppercase;font-size:28px;line-height:.95}
+.rnum{font-family:var(--f-display);font-stretch:72%;font-weight:900;font-size:48px;line-height:.85;min-width:36px}
+.rtitle h3{font-size:17px;font-weight:700}
+.var{border-radius:4px;background:var(--bg)}
+.var .tag{font-family:var(--f-mono)}
+.chip{border-radius:3px;background:var(--chip)}
+input[type=text],input[type=number],select,textarea{border-radius:4px}
+.verdict{border-radius:4px}
+.btn{border-radius:4px}
+.flight .eyebrow{color:var(--accent-text)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="tagrow">
+    <span class="byline">CRM lab by Simplificate</span>
+    <button class="themebtn" id="themebtn" type="button"><span class="ti" aria-hidden="true"></span><span id="themelabel">Dark mode</span></button>
+  </div>
+  <header class="top">
+    <div>
+      <div class="eyebrow">For B2B salon software platforms</div>
+      <h1>CRM Testing<span>Lab</span></h1>
+      <p>Eight rounds, one variable per round. Each test has a hypothesis, a behavioural principle, a sample check before it runs and a decision rule after. What wins goes into the learning log and into the next send.</p>
+    </div>
+    <div class="side">
+      <span class="eyebrow">Load a case</span>
+      <div class="seg" role="group" aria-label="Cases">
+        <button type="button" data-case="menu" aria-pressed="true">Onboarding · Service menu</button>
+        <button type="button" data-case="air" aria-pressed="false">Launch · AI Receptionist</button>
+        <button type="button" data-case="dac7" aria-pressed="false">Reactive · DAC7 tax details</button>
+        <button type="button" data-case="sms" aria-pressed="false">Lifecycle · SMS rebook reminders</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="summary" id="summary"></div>
+
+  <div class="grid">
+    <aside class="rail">
+      <section class="panel">
+        <div class="eyebrow">The method</div>
+        <h2>Rules for every test</h2>
+        <ol class="rules">
+          <li>Flight 1 is for learning. Each round answers one question about what partners need and value.</li>
+          <li><b>Frequency cap.</b> At most one adoption email per partner per week, across all campaigns. Service messages are exempt, and onboarding journeys follow their own timing. A partner can join several rounds over time but never sees the same test twice, and nothing is carried over from one round to the next.</li>
+          <li><b>Exclusions.</b> Each send leaves out partners who already subscribed, the holdout, and partners in another test that week. Service messages run without a holdout, since every partner must receive them. A sunset rule leaves out partners who have not opened any of our emails in 90 days: they are reached in-app or by an Account Manager.</li>
+          <li>One variable per round. Everything else stays the same. Before each send, a second CRM executive checks both cells (buddy check).</li>
+          <li>Split at random at company level, so every user in a salon gets the same cell, with a test property on the company in HubSpot. Compare cells only within the same group and market.</li>
+          <li>Write the hypothesis and the principle before the send, and name the group it is tested on.</li>
+          <li>Check the sample first. If a group is too small for one send, spread Flight 1 over more sends, at least a week apart. Pool markets only when the copy is the same concept in each language, and split cells within each market.</li>
+          <li>The goal decides: the version that gets more partners to take the action we want wins. Clicks and opens are supporting signals only, and Apple Mail Privacy Protection inflates opens.</li>
+          <li>Log a learning when the sample is reached and the result is significant at 95%, or earlier only if the result is overwhelming (p &lt; 0.001). Otherwise partners did not respond differently, and the choice matters less.</li>
+          <li>Watch the guardrails: unsubscribes and spam complaints under 0.1%, never above 0.3% (Gmail's limit).</li>
+          <li>Legal and compliance wording is never tested. Only framing, order and timing.</li>
+        </ol>
+      </section>
+
+      <section class="panel">
+        <div class="eyebrow">Sample check</div>
+        <h2 id="poolTitle">Who is in the test</h2>
+        <div class="segdefs" id="segdefs"></div>
+        <div class="field"><label for="holdout">Holdout kept out of all sends (%)</label><input type="number" id="holdout" min="0" max="30" step="1"></div>
+        <div class="mkin" id="markets"></div>
+        <p class="guard" id="poolNote"></p>
+      </section>
+    </aside>
+
+    <main class="map" id="map" aria-live="polite"></main>
+  </div>
+
+  <section class="panel">
+    <div class="eyebrow">Learning log</div>
+    <h2>What we learned, and where it goes next</h2>
+    <div class="scroll"><table class="log"><thead><tr><th>Round</th><th>Variable</th><th>Result</th><th>Principle</th><th>Apply to</th></tr></thead><tbody id="log"></tbody></table></div>
+    <div><button type="button" class="btn" id="reset">Reset this case to the example</button></div>
+  </section>
+
+  <footer class="foot">
+    <div>Concept built by Roberta Cunha to show a CRM testing method for a B2B salon software platform. Not connected to any company system. Products, features, dates and prices are illustrative. Partner counts, baselines and results are fictional and marked as such. Copy variants are proposals for testing.</div>
+    <div>Significance uses a two-proportion z-test at 95%. Sample sizes assume 80% power. Your edits are kept in this browser only.</div>
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+var CASES={
+ air:{
+  note:'<b>Example case.</b> The platform launches an AI Receptionist add-on. It answers salon calls, books, reschedules and cancels in the platform calendar and confirms by text. The goal of these tests is the strongest message for partners who have not tried it yet. <span class="guard">Product details are illustrative.</span>',
+  goal:"AI Receptionist adoption", metric:"Subscriptions within 30 days",
+  segs:[{id:"na",label:"Not aware",def:"Never opened or clicked an AI Receptionist message, but opened at least one of our emails in the last 90 days, so email can reach them"},{id:"ac",label:"Aware, not convinced",def:"Opened or clicked a launch message, or visited the page, but did not subscribe"}], pool:"Non-adopters per market", markets:{UK:{na:9000,ac:3000},DE:{na:6000,ac:2000}}, holdout:10,
+  rounds:[
+   {q:"What do partners value most: help while they are working, or being reachable day and night?",ta:["Recognition","Relief"],tb:["Peace of mind","Security"],pa:"Mental simulation",pb:"Certainty effect",la:"With a client",lb:"Day and night",s:"na",v:"Value premise",p:"Mental simulation vs certainty",h:"Partners who don't know AI Receptionist yet react faster to a moment they live every day than to a product promise. If so, the subject showing a call they can't take while with a client (cell A) will get more partners to subscribe within 30 days than the one promising cover day and night (cell B).",a:"Answer every call, even when you're with a client",b:"Your salon phone, answered day and night",m:"Subscriptions within 30 days",base:2.5,mde:60,apply:"Core value message for the AI Receptionist"},
+   {q:"Do partners respond more to what they gain or to what they could lose?",ta:["Optimism","Control"],tb:["Fear of missing out","Urgency"],pa:"Gain framing",pb:"Loss aversion",la:"Gain",lb:"Loss",s:"na",v:"Subject line framing",p:"Gain vs loss",h:"Both cells keep the launch premise and change only the frame. People act more to avoid a loss than to get the same gain. If so, naming the bookings lost to missed calls (cell B) will get more partners to subscribe within 30 days than naming the bookings kept (cell A).",a:"Keep every booking, even when you're with a client",b:"Stop missing bookings when you can't pick up",m:"Subscriptions within 30 days",base:2.5,mde:60,apply:"Framing for AI Receptionist subject lines",res:{nA:3300,xA:79,nB:3300,xB:122}},
+   {q:"What gets them to open: a clear next step, or how it works?",ta:["Confidence","Ease"],tb:["Trust","Curiosity"],pa:"Clear next step",pb:"Proof through specifics",la:"Next step",lb:"How it works",s:"na",v:"Preview text",p:"Next step vs how it works",h:"The subject already names the problem, so the preview should add something new. A concrete next step makes acting feel easier than a list of features. If so, the sample call preview (cell A) will get more partners to subscribe within 30 days than the how-it-works preview (cell B).",a:"Listen to a sample call it answered",b:"It books, reschedules and cancels straight into your calendar",m:"Subscriptions within 30 days",base:2.5,mde:60,apply:"Preview text pattern for launch emails"},
+   {q:"Where do they pay attention: email, or inside the app?",ta:["Clarity"],tb:["Familiarity", "Trust"],pa:"Single touch",pb:"Mere exposure: seen again where they work",la:"Email only",lb:"Email + in-app",s:"na",v:"Channel",p:"Repetition in context",h:"Partners spend their working day in the salon app, not in their inbox. Seeing the offer again where they work makes it familiar and easier to act on. If so, email plus a What's New card (cell B) will get more partners to subscribe within 30 days than email only (cell A).",a:"Email only",b:"Email plus in-app What's New card",m:"Subscriptions within 30 days",base:2.5,mde:60,apply:"Channel mix for Tier 1 launches"},
+   {q:"Which value moves them to act: time or money?",ta:["Relief", "Calm"],tb:["Frustration", "Urgency"],pa:"Present bias: relief from admin today",pb:"Loss aversion: lost bookings",la:"Time saved",lb:"Money",s:"ac",v:"Body angle",p:"Time saved vs money",h:"Calls interrupt a partner's day every day, while lost revenue is harder to see. If so, the time angle (cell A) will get more partners to subscribe within 30 days than the money angle (cell B).",a:"Time: calls interrupt your working day. The AI Receptionist takes them so you can stay with your client.",b:"Money: every unanswered call can be a lost booking. The AI Receptionist answers day and night and books straight into your calendar.",m:"Subscriptions within 30 days",base:2.5,mde:60,apply:"Angle for the launch follow-up and Account Manager talk track"},
+   {q:"Do they trust other salon owners more than product facts?",ta:["Clarity","Trust"],tb:["Belonging","Reassurance"],pa:"Product facts",pb:"Social proof",la:"Facts",lb:"Peer proof",s:"ac",v:"Social proof",p:"Product facts vs a salon owner's words",h:"Partners who know the product but haven't subscribed doubt it works for a salon like theirs. Another salon owner's words answer that doubt better than product facts. If so, the partner quote (cell B) will get more partners to subscribe within 30 days than product facts alone (cell A).",a:"It answers, books and confirms by text, so your team can stay with clients.",b:"A short quote from a salon owner already using it (use an approved partner quote).",m:"Subscriptions within 30 days",base:2.5,mde:60,apply:"Proof block in launch and follow-up emails"},
+   {q:"Do they want to try first, or decide directly?",ta:["Control", "Ambition"],tb:["Curiosity", "Ease"],pa:"Direct commitment",pb:"Foot in the door: a small first step",la:"Commit now",lb:"Try first",s:"ac",v:"Call to action",p:"Small first step (foot in the door)",h:"Paying for a new tool feels like a big step for partners who are still unsure. A small first step, hearing it answer, lowers that barrier. If so, 'Listen to a sample call' (cell B) will get more partners to subscribe within 30 days than 'Start your subscription' (cell A).",a:"Start your subscription",b:"Listen to a sample call",m:"Subscriptions within 30 days",base:2.5,mde:60,apply:"CTA for paid add-ons"},
+   {q:"How long do they need before they act?",ta:["Calm", "Autonomy"],tb:["Curiosity", "Momentum"],pa:"Spacing: time to consider",pb:"Recency: interest still fresh",la:"Day 7",lb:"Day 3",s:"ac",v:"Follow-up timing",p:"Recency vs fatigue",h:"Interest fades quickly after the first email. If so, a reminder on day 3 (cell B) will get more partners to subscribe within 30 days than one on day 7 (cell A), without raising unsubscribes.",a:"Reminder on day 7",b:"Reminder on day 3",m:"Subscriptions, unsubscribes as guardrail",base:2.5,mde:60,apply:"Reminder cadence in launch sequences"}
+  ]},
+ dac7:{
+  note:'<b>Example case.</b> Under the EU DAC7 and UK DRR rules, platforms must collect their partners\' business and tax details. Partners who miss the deadline may have payments affected and access paused. We only ask through official email or inside the account. Legal wording stays fixed: these tests only change framing, order and timing, with Legal sign-off. <span class="guard">The deadline of 14 December is illustrative.</span>',
+  goal:"DAC7 completion before 14 December", metric:"Details completed by the deadline",
+  segs:[{id:"all",label:"Details incomplete",def:"Receives payouts and has not completed the tax details yet"}], pool:"Partners still incomplete per market", markets:{UK:{all:5200},NL:{all:3900},ES:{all:4300},IT:{all:4800},FR:{all:3600},DE:{all:3100},BE:{all:1500}}, holdout:0,
+  rounds:[
+   {q:"What gets partners to act on a required task: the consequence or the deadline?",ta:["Concern", "Urgency"],tb:["Clarity", "Urgency"],pa:"Loss aversion: payouts at risk",pb:"Deadline effect: a clear date",la:"Consequence first",lb:"Deadline first",s:"all",v:"Subject line framing",p:"Deadline vs consequence",h:"A clear deadline gets more completions than leading with the risk, which can read like a scam.",a:"Action needed by 14 Dec: keep payouts running",b:"Complete your tax details by 14 December",m:"Completion within 7 days",base:18,mde:15,apply:"Subject lines for all compliance sends"},
+   {q:"Does a named payments team feel more trustworthy than the brand alone?",ta:["Trust"],tb:["Trust", "Security"],pa:"Familiarity: the known brand",pb:"Authority: a named payments team",la:"Brand",lb:"Payments team",s:"all",v:"Sender name",p:"Authority and trust",h:"A named finance or compliance sender lowers scam fears and lifts completion.",a:"[Brand name]",b:"[Brand name] Partner Payments",m:"Completion within 7 days",base:18,mde:15,apply:"Sender for payment and compliance messages"},
+   {q:"Do partners need reassurance before they share their details?",ta:["Clarity"],tb:["Security", "Trust"],pa:"Direct ask",pb:"Trust signalling: reassurance before the ask",la:"Ask first",lb:"Trust first",s:"all",v:"Order of the message",p:"Trust before the ask",h:"Opening with the security line (how we will and won't ask) before the request raises completion.",a:"Request first, security line at the end",b:"Security line first, then the request",m:"Completion within 7 days",base:18,mde:15,apply:"Template order for anything asking for data"},
+   {q:"Does knowing how long it takes lower the barrier to start?",ta:["Neutral"],tb:["Ease", "Relief"],pa:"No effort cue",pb:"Effort reduction: a time estimate",la:"No time stated",lb:"Time stated",s:"all",v:"Effort framing",p:"Reduce perceived effort",h:"Stating how long the form takes lowers friction. Only use a time that is true.",a:"Complete your details",b:"Complete your details (about 5 minutes, check before sending)",m:"Completion within 7 days",base:18,mde:15,apply:"CTA wording for admin tasks"},
+   {q:"Do partners drop off because they are not prepared?",ta:["Neutral"],tb:["Confidence", "Control"],pa:"No preparation cue",pb:"Implementation intention: prepare first",la:"No checklist",lb:"Checklist",s:"all",v:"Checklist in the email",p:"Preparation lowers drop-off",h:"Listing the documents to have ready (VAT number, registration number, bank account) means fewer partners start and give up.",a:"No checklist",b:"Short checklist of what to have ready",m:"Started vs completed",base:60,mde:8,apply:"Admin request template"},
+   {q:"When do partners deal with admin?",ta:["Focus"],tb:["Motivation"],pa:"Attention: end of the week",pb:"Fresh start effect: the start of the week",la:"Thursday",lb:"Monday",s:"all",v:"Send time",p:"Available attention",h:"A Monday send gets more completions in the first week than a Thursday send.",a:"Thursday 10:00",b:"Monday 09:00",m:"Completion within 7 days",base:18,mde:15,apply:"Send slot for required actions"},
+   {q:"Do partners who ignore email act on a notice inside their account?",ta:["Clarity"],tb:["Familiarity", "Trust"],pa:"Single touch",pb:"Mere exposure: seen again in the account",la:"Email only",lb:"Email + in-app",s:"all",v:"Channel",p:"Repetition in context",h:"An in-app banner next to email reaches partners who ignore email.",a:"Email only",b:"Email plus in-app notice",m:"Completion by the deadline",base:55,mde:8,apply:"Channel mix for all required actions"},
+   {q:"How many reminders do partners need before they act?",ta:["Calm", "Respect"],tb:["Restlessness", "Relief"],pa:"Avoid fatigue",pb:"Zeigarnik effect: an unfinished task stays on the mind",la:"Two reminders",lb:"Four reminders",s:"all",v:"Reminder cadence",p:"Recency vs fatigue",h:"Four reminders to incomplete partners beat two, with no rise in complaints.",a:"Two reminders",b:"Four reminders",m:"Completion by the deadline, complaints as guardrail",base:55,mde:8,apply:"Cadence for deadline-driven sends"}
+  ]},
+ menu:{"note": "<b>Example case.</b> Only 45% of new partners add their full service menu within 30 days, and partners who complete the menu and invite their team are 2x as likely to be active at month 6. The eight rounds show what Flight 1 would learn about getting more menus completed. Partner counts, baselines and results are fictional, to show how the method reads real data.", "goal": "Full service menu", "metric": "Menus completed within 7 days of the send", "segs": [{"id": "st", "label": "Menu started", "def": "Added at least one service, menu not complete yet"}, {"id": "em", "label": "Menu empty", "def": "Account created, no services added yet"}], "pool": "New partners over six months per market", "markets": {"UK": {"st": 5400, "em": 3600}, "NL": {"st": 3000, "em": 2100}, "ES": {"st": 3600, "em": 2400}, "IT": {"st": 3300, "em": 2400}, "DE": {"st": 2700, "em": 1800}}, "holdout": 10, "rounds": [{"q": "What do new partners value most: their clients, or their own services?", "ta": ["Care", "Responsibility"], "tb": ["Pride", "Recognition"], "pa": "Perspective taking: the client's view", "pb": "Self-reference: their own work", "la": "Their clients", "lb": "Their services", "s": "st", "v": "Subject line focus", "p": "Their clients vs their services", "h": "This is the day 3 email of the onboarding journey. The body stays the same, so the subject line is the only difference. If partners think like business owners, the client view (cell A) will get more menus completed within 7 days. If they think like craftspeople, their own work (cell B) will. The winning focus leads the next emails.", "a": "Can clients see everything you offer?", "b": "Is everything you do on your menu?", "m": "Menus completed within 7 days", "base": 20, "mde": 10, "apply": "Focus for every menu email that follows", "res": {"nA": 6700, "xA": 1467, "nB": 6700, "xB": 1367}, "resNote": "pooled over about five months of sign-ups"}, {"q": "Do they move more to avoid a loss, or to build on what they've started?", "ta": ["Concern", "Urgency"], "tb": ["Pride", "Momentum"], "pa": "Loss aversion", "pb": "Endowed progress effect", "la": "Loss", "lb": "Progress", "s": "st", "v": "Subject line frame", "p": "Loss vs progress", "h": "Both subjects keep the clients focus, so only the frame changes. People act more to avoid a loss than to get the same gain. If so, the loss frame (cell A) will get more menus completed within 7 days than the progress frame (cell B).", "a": "Can clients see everything you offer?", "b": "Clients can already book your first treatments. What's next?", "m": "Menus completed within 7 days", "base": 20, "mde": 10, "apply": "Frame for setup subject lines", "res": {"nA": 6650, "xA": 1370, "nB": 6650, "xB": 1337}, "resNote": "pooled over the next five months"}, {"q": "Does a nudge to continue now beat permission to take their time?", "ta": ["Momentum", "Ease"], "tb": ["Calm", "Autonomy"], "pa": "Open loop: pick up where they left off", "pb": "Autonomy: their own pace", "la": "Continue now", "lb": "Own pace", "s": "st", "v": "Preview text", "p": "Continue now vs own pace", "h": "The preview should move them to act, not give them a reason to wait. If so, 'Pick up where you left off' (cell A) will get more menus completed within 7 days than 'Your menu, at your own pace' (cell B).", "a": "Pick up where you left off", "b": "Your menu, at your own pace", "m": "Menus completed within 7 days", "base": 20, "mde": 10, "apply": "Preview text for setup reminders", "res": {"nA": 2900, "xA": 596, "nB": 2900, "xB": 574}, "resNote": "first two months", "st": "running"}, {"q": "Do they need empathy first, or the reason first?", "ta": ["Relief", "Ease"], "tb": ["Clarity", "Purpose"], "pa": "Empathy first: lowering the pressure", "pb": "Reason why: what clients see", "la": "Empathy first", "lb": "Reason first", "s": "st", "v": "Body opener", "p": "Empathy vs reason first", "h": "Busy owners push back on pressure. Lifting it first makes the ask feel smaller. If so, the empathy opener (cell A) will get more menus completed within 7 days than the reason-first opener (cell B).", "a": "Your menu doesn't have to be done in one sitting. Add a few now and come back for the rest.", "b": "Clients choose from what they can see. If a treatment isn't on your menu, they can't book it.", "m": "Menus completed within 7 days", "base": 20, "mde": 10, "apply": "Opening line for setup emails"}, {"q": "Does a smaller, named step get more of them moving?", "ta": ["Control"], "tb": ["Ease", "Confidence"], "pa": "Open ask", "pb": "Tiny Habits: a small, named step", "la": "Open ask", "lb": "Small step", "s": "st", "v": "Call to action", "p": "Open ask vs small named step", "h": "An open-ended task feels bigger than it is. Naming a small, finite step lowers the barrier. If so, 'Add three services now' (cell B) will get more menus completed within 7 days than 'Add my services' (cell A).", "a": "Add my services", "b": "Add three services now", "m": "Menus completed within 7 days", "base": 20, "mde": 10, "apply": "CTA for setup tasks"}, {"q": "Do they learn better from reading the steps, or from seeing them done?", "ta": ["Clarity", "Control"], "tb": ["Confidence", "Ease"], "pa": "Written steps", "pb": "Demonstration: seeing it done", "la": "Written", "lb": "Video", "s": "em", "v": "How-to format", "p": "Written steps vs video", "h": "Partners who haven't started are unsure how. Watching the exact clicks lowers that barrier more than reading them. If so, the short video (cell B) will get more partners to add their first services within 7 days than written steps (cell A).", "a": "Three written steps, with a deep link to the setting", "b": "A short video showing the same steps, with the same deep link", "m": "First services added within 7 days", "base": 15, "mde": 10, "apply": "Format for setup help in email and the help centre", "res": {"nA": 9400, "xA": 1391, "nB": 9400, "xB": 1560}, "resNote": "pooled over about ten months of sign-ups"}, {"q": "Does a named person make the call offer feel more real?", "ta": ["Trust"], "tb": ["Belonging", "Reassurance"], "pa": "Familiarity: the known brand", "pb": "Liking: a named person", "la": "Brand", "lb": "Named person", "s": "em", "v": "Sender name", "p": "Brand vs a named Account Manager", "h": "An offer of help feels more personal when it comes from someone with a name. If so, the Account Manager's name as sender (cell B) will get more partners to add their first services within 7 days than the brand name (cell A), with more setup guidance calls booked.", "a": "[Brand name]", "b": "[Account Manager name] at [Brand name]", "m": "First services added within 7 days", "base": 15, "mde": 10, "apply": "Sender for help and call offers", "res": {"nA": 3100, "xA": 468, "nB": 3100, "xB": 490}, "resNote": "first three months", "st": "running"}, {"q": "Which question gets more of them to tell us what they need?", "ta": ["Care", "Trust"], "tb": ["Ease", "Autonomy"], "pa": "Offer of help", "pb": "Ability: what would make it easier", "la": "Offer help", "lb": "Make it easier", "s": "em", "v": "Check-in question", "p": "Offer of help vs what would make it easier", "h": "A question about what would make setup easier invites a concrete answer, so we learn the barrier and route help faster. If so, cell B will get more partners to add their first services within 7 days than the general offer of help (cell A), with more one-click answers.", "a": "How can we help you get set up?", "b": "What would make setup easier for you?", "m": "First services added within 7 days", "base": 15, "mde": 10, "apply": "Check-in question for stalled setups"}]},
+ sms:{
+  note:'<b>Example feature.</b> The platform adds automatic rebook reminders by email and SMS. SMS needs credit top-ups and desktop setup is recommended. Every rebook fills a slot in their calendar. <span class="guard">Feature details are illustrative.</span>',
+  goal:"SMS rebook reminders switched on", metric:"Partners with SMS reminders on after 30 days",
+  segs:[{id:"all",label:"SMS reminders off",def:"Email rebook reminders on, SMS rebook reminders off"}], pool:"Partners with SMS off per market", markets:{UK:{all:2400},BE:{all:500},NL:{all:1800},ES:{all:1700},IT:{all:1900}}, holdout:10,
+  rounds:[
+   {q:"Do partners respond more to a question about their own problem, or to a statement?",ta:["Optimism"],tb:["Curiosity", "Recognition"],pa:"Benefit framing",pb:"Curiosity and self-reference: a question",la:"Statement",lb:"Question",s:"all",v:"Subject line hook",p:"Question vs statement",h:"A question about a real pain (clients forgetting to rebook) gets more partners to switch SMS reminders on than a statement of the feature.",a:"Clients rebook faster by text",b:"Are your clients forgetting to rebook?",m:"Switched on within 30 days",base:4,mde:40,apply:"Subject lines for adoption flows"},
+   {q:"Does a team sender feel closer than the brand alone?",ta:["Trust"],tb:["Belonging", "Trust"],pa:"Familiarity: the known brand",pb:"Social presence: a team behind it",la:"Brand",lb:"Team",s:"all",v:"Sender name",p:"Trust and familiarity",h:"A team sender gets more partners to switch SMS reminders on than the brand name alone.",a:"[Brand name]",b:"[Brand name] Partner Team",m:"Switched on within 30 days",base:4,mde:40,apply:"Default sender for adoption flows"},
+   {q:"What gets them to open: how it works, or the next step?",ta:["Optimism"],tb:["Confidence", "Ease"],pa:"How it works",pb:"Clear next step (implementation intention)",la:"How it works",lb:"Next step",s:"all",v:"Preview text",p:"How it works vs next step",h:"Preview text should add to the subject line, not repeat it. Naming the setup step gets more partners to switch SMS reminders on than describing how it works.",a:"Clients get a text when it is time to book again",b:"Switch it on in the app, then top up your SMS credits",m:"Switched on within 30 days",base:4,mde:40,apply:"Preview text for how-to emails"},
+   {q:"Which value moves them: client convenience or a fuller calendar?",ta:["Relief", "Care"],tb:["Pride", "Smart choice"],pa:"Ease: convenience for clients",pb:"Value salience: a fuller calendar",la:"Convenience",lb:"Fuller calendar",s:"all",v:"Body angle",p:"Fuller calendar vs client convenience",h:"Reminding partners that rebooked clients fill their calendar beats a client convenience angle.",a:"Convenience: your clients get a text when it is time to book again, and rebook in a tap.",b:"Fuller calendar: a text reminder brings clients back sooner, so fewer slots stay empty.",m:"Switched on within 30 days",base:4,mde:40,apply:"Value angle in all lifecycle messages"},
+   {q:"Do they want to see the steps before committing?",ta:["Control"],tb:["Ease", "Confidence"],pa:"Direct ask",pb:"Effort reduction: see the steps first",la:"Switch on",lb:"Show steps",s:"all",v:"Call to action",p:"Small first step",h:"A step-by-step setup link beats a generic button.",a:"Switch on SMS reminders",b:"Show me the 3 setup steps",m:"Click to switched on",base:7,mde:30,apply:"CTA for features that need setup"},
+   {q:"Does a device hint prevent failed setups?",ta:["Neutral"],tb:["Ease", "Confidence"],pa:"No cue",pb:"Friction removal: the right device",la:"No hint",lb:"Desktop hint",s:"all",v:"Device hint",p:"Remove friction",h:"Telling partners that setup works best on desktop prevents failed attempts on the phone.",a:"No device hint",b:"Best set up on your computer",m:"Started vs switched on",base:45,mde:15,apply:"Any feature with desktop setup"},
+   {q:"Where do they pay attention: email, or inside the app?",ta:["Clarity"],tb:["Familiarity", "Trust"],pa:"Single touch",pb:"Mere exposure: seen again where they work",la:"Email only",lb:"Email + in-app",s:"all",v:"Channel",p:"Repetition in context",h:"A What's New card in the app lifts adoption next to email.",a:"Email only",b:"Email plus in-app What's New card",m:"Switched on within 30 days",base:4,mde:40,apply:"Channel mix for lifecycle flows"},
+   {q:"How long do they need before they act?",ta:["Calm", "Autonomy"],tb:["Curiosity", "Momentum"],pa:"Spacing: time to consider",pb:"Recency: interest still fresh",la:"Day 10",lb:"Day 3",s:"all",v:"Follow-up timing",p:"Recency vs fatigue",h:"A reminder after 3 days beats one after 10 days, without more unsubscribes.",a:"Reminder on day 10",b:"Reminder on day 3",m:"Switched on, unsubscribes as guardrail",base:4,mde:40,apply:"Reminder cadence in lifecycle flows"}
+  ]}
+};
+
+var KEY="crmlab-v1";
+var state;
+function fresh(){var s={current:"menu",cases:{}};Object.keys(CASES).forEach(function(k){s.cases[k]=JSON.parse(JSON.stringify({holdout:CASES[k].holdout,markets:CASES[k].markets,rounds:CASES[k].rounds.map(function(r){return {a:r.a,b:r.b,base:r.base,mde:r.mde,status:r.st||(r.res?"done":"planned"),res:r.res||{nA:"",xA:"",nB:"",xB:""}};})}));});s.cases.menu.v=4;return s;}
+function load(){try{var s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.cases&&s.cases.air){var f=fresh();Object.keys(CASES).forEach(function(k){if(!s.cases[k])s.cases[k]=f.cases[k];});if(s.cases.menu.v!==4)s.cases.menu=f.cases.menu;if(!CASES[s.current])s.current="air";return s;}}catch(e){}return null;}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+state=load()||fresh();
+var $=function(id){return document.getElementById(id);};
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function fmt(n){return Math.round(n).toLocaleString("en-GB");}
+
+/* Statistics */
+function nPerArm(base,mde){var p1=base/100,p2=p1*(1+mde/100);if(p2>=1||p1<=0)return Infinity;var pb=(p1+p2)/2;var a=1.959964*Math.sqrt(2*pb*(1-pb)),b=0.841621*Math.sqrt(p1*(1-p1)+p2*(1-p2));return Math.ceil(Math.pow(a+b,2)/Math.pow(p2-p1,2)/100)*100;}
+function erf(x){var t=1/(1+0.3275911*Math.abs(x));var y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return x>=0?y:-y;}
+function ztest(nA,xA,nB,xB){if(!(nA>0&&nB>0)||xA<0||xB<0||xA>nA||xB>nB)return null;var pA=xA/nA,pB=xB/nB,p=(xA+xB)/(nA+nB);var se=Math.sqrt(p*(1-p)*(1/nA+1/nB));if(!se)return null;var z=(pB-pA)/se;var pv=2*(1-0.5*(1+erf(Math.abs(z)/Math.SQRT2)));return {pA:pA,pB:pB,lift:pA?((pB-pA)/pA)*100:0,z:z,p:pv};}
+
+function avail(c,sg){var st=state.cases[c],tot=0;Object.keys(st.markets).forEach(function(m){var o=st.markets[m];Object.keys(o).forEach(function(k){if(!sg||k===sg)tot+=(+o[k]||0);});});var inTest=tot*(1-st.holdout/100);return {tot:tot,perArm:Math.floor(inTest/2)};}
+
+function sendName(c,i,cell){var code={air:'AIR',dac7:'DAC7',sms:'SMS',menu:'MENU'}[c];var v=CASES[c].rounds[i].v.replace(/[^A-Za-z0-9 ]/g,'').split(' ').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join('');return 'TW_'+code+'_R'+(i+1)+cell+'_'+v;}
+function psych(p,t){return '<div class="psy"><span class="plab">Psychology</span><span class="pval">'+esc(p.split(':')[0])+'</span><span class="plab">Emotional triggers</span><span class="chips">'+(t||[]).map(function(x){return '<span class="chip">'+esc(x)+'</span>';}).join('')+'</span></div>';}
+function segLabel(c,id){var f=CASES[c].segs.filter(function(x){return x.id===id;})[0];return f?f.label:id;}
+function verdict(c,i){
+ var R=CASES[c].rounds[i],r=state.cases[c].rounds[i],need=nPerArm(r.base,r.mde),res=r.res,t=ztest(+res.nA,+res.xA,+res.nB,+res.xB);
+ if(!t)return {cls:"",html:"Enter the results to get a verdict.",short:"Not run yet",win:null};
+ var reached=(+res.nA>=need&&+res.nB>=need);
+ var lead=t.pB>=t.pA?'B':'A',ll=lead==='B'?(t.pA?(t.pB-t.pA)/t.pA*100:0):(t.pB?(t.pA-t.pB)/t.pB*100:0);var line='Cell A'+' '+(t.pA*100).toFixed(1)+'% · '+'Cell B'+' '+(t.pB*100).toFixed(1)+'% · +'+ll.toFixed(0)+'% lift for cell '+lead+' · '+(t.p<0.001?'p &lt; 0.001':'p = '+t.p.toFixed(3));
+ var nb=R.pb.split(':')[0],na=R.pa.split(':')[0];
+ if(!reached&&t.p<0.001){var wc=t.lift>0?'B':'A',wn=t.lift>0?nb:na;return {cls:"win",html:'<b>Partners respond more to cell '+wc+' ('+esc(wn)+'). Clear result before the full sample.</b> '+line+'. The difference is strong enough to stop early (p &lt; 0.001). Log the learning.',short:"Cell "+wc+": "+wn+" (early)",win:wc};}
+ if(!reached)return {cls:"flat",html:'<b>Keep running.</b> '+line+'. Sample not reached yet ('+fmt(need)+' per cell needed).',short:"Running, sample not reached",win:null};
+ if(t.p<0.05&&t.lift>0)return {cls:"win",html:'<b>Partners respond more to cell B ('+esc(nb)+').</b> '+line+'. Log the learning.',short:"Cell B: "+nb+" (+"+t.lift.toFixed(0)+"%)",win:"B"};
+ if(t.p<0.05&&t.lift<0)return {cls:"win",html:'<b>Partners respond more to cell A ('+esc(na)+').</b> '+line+'. Log the learning.',short:"Cell A: "+na+" (+"+ll.toFixed(0)+"%)",win:"A"};
+ return {cls:"flat",html:'<b>No clear difference.</b> '+line+'. Partners did not respond differently, so this choice matters less for them.',short:"No clear difference",win:"none"};
+}
+
+function tgt(r){var b=+r.base,t=b*(1+(+r.mde)/100);function f(x){return (Math.round(x*10)/10).toString();}return f(b)+'% \u2192 '+f(t)+'%';}
+function feas(c,i){var r=state.cases[c].rounds[i],need=nPerArm(r.base,r.mde),av=avail(c,CASES[c].rounds[i].s).perArm;
+ if(!isFinite(need))return '<span class="pill crit">Check baseline and lift</span>';
+ if(need<=av)return '<span class="pill ok">'+fmt(need)+' per cell · fits</span>';
+ if(need<=av*2)return '<span class="pill warn">'+fmt(need)+' per cell · pool with the next wave</span>';
+ return '<span class="pill crit">'+fmt(need)+' per cell · too small, aim for a bigger lift</span>';}
+
+function renderSummary(){var c=state.current,k=CASES[c],av=avail(c),fit=0;state.cases[c].rounds.forEach(function(r,i){if(nPerArm(r.base,r.mde)<=avail(c,k.rounds[i].s).perArm)fit++;});
+ var done=state.cases[c].rounds.filter(function(r){return r.status==="done";}).length;
+ $("summary").innerHTML=
+  '<div class="sum"><span class="k">Test goal</span><span class="t">'+esc(k.goal)+'</span></div>'+
+  '<div class="sum"><span class="k">Decided by</span><span class="t">'+esc(k.metric)+'</span></div>'+
+  '<div class="sum"><span class="k">Partners in pool</span><span class="n">'+fmt(av.tot)+'</span><span class="c">'+esc(k.pool.replace(' per market',''))+'</span></div>'+
+  '<div class="sum"><span class="k">'+(c==="menu"?'Waves needed':'Sends needed')+'</span><span class="n">'+maxWaves(c)+'</span><span class="c">'+(c==="menu"?'Six-month sign-up waves to run all 8 rounds':'At least a week apart, to run all 8 rounds')+'</span></div>'+
+  '<div class="sum"><span class="k">Progress</span><span class="n">'+done+'<small> / 8</small></span><span class="bar"><i style="width:'+(done/8*100)+'%"></i></span><span class="c">Rounds completed</span></div>';}
+
+function renderMarkets(){var c=state.current,k=CASES[c],mk=state.cases[c].markets,keys=Object.keys(mk),sg=k.segs;
+ $("poolTitle").textContent=k.pool;
+ $("segdefs").innerHTML=sg.map(function(x){return '<div><b>'+esc(x.label)+'.</b> '+esc(x.def)+'</div>';}).join("")+(sg.length>1?'<div class="segnote">Groups are set from CRM data before each round and update after every send. Partners who open or click move to Aware, not convinced. Partners who subscribe leave the test. A conversion in the Not aware group means knowing it exists was enough. Partners who have not opened any of our emails in 90 days are left out of email tests: more email will not reach them and hurts deliverability, so they are reached in-app or by an Account Manager.</div>':'');
+ var g=$("markets");g.style.gridTemplateColumns="36px repeat("+sg.length+",minmax(0,1fr))";
+ var h='<span></span>'+sg.map(function(x){return '<span class="hint">'+esc(x.label)+'</span>';}).join("");
+ keys.forEach(function(m){h+='<span class="mono"><b>'+m+'</b></span>'+sg.map(function(x){return '<input type="number" min="0" step="100" id="mk_'+m+'_'+x.id+'" data-mk="'+m+'" data-sg="'+x.id+'" aria-label="'+m+', '+esc(x.label)+'" value="'+(+mk[m][x.id]||0)+'">';}).join("");});
+ g.innerHTML=h;$("holdout").value=state.cases[c].holdout;renderPool();}
+function maxWaves(c){var hold=state.cases[c].holdout,m=1;CASES[c].segs.forEach(function(x){var need=flightNeed(c,x.id),av=Math.floor(avail(c,x.id).tot*(1-hold/100));if(need&&av>0)m=Math.max(m,Math.ceil(need/av));});return m;}
+function flightNeed(c,sg){var t=0,par=(c==="menu"&&sg==="em");CASES[c].rounds.forEach(function(R,i){if(R.s===sg){var n=nPerArm(state.cases[c].rounds[i].base,state.cases[c].rounds[i].mde);if(isFinite(n))t=par?Math.max(t,2*n):t+2*n;}});return t;}
+function renderPool(){var c=state.current,k=CASES[c],hold=state.cases[c].holdout,parts=[];
+ k.segs.forEach(function(x){var need=flightNeed(c,x.id);if(!need)return;var av=Math.floor(avail(c,x.id).tot*(1-hold/100));var waves=av>0?Math.ceil(need/av):Infinity;
+  parts.push(x.label+" group: Flight 1 uses "+fmt(need)+" partners of "+fmt(av)+" available, "+(waves<=1?"so it fits in one wave":isFinite(waves)?"so it runs over "+waves+" waves":"so add partner counts"));});
+ $("poolNote").textContent=parts.join(". ")+". Example counts: replace them with real numbers from the CRM.";}
+function renderMap(){var c=state.current,k=CASES[c],h='<div class="flight"><span class="eyebrow">Flight 1 · Learn</span><p>Eight independent rounds. A partner never sees the same test twice, and nothing is carried over.</p></div>';
+ k.rounds.forEach(function(R,i){var r=state.cases[c].rounds[i],v=verdict(c,i);
+  h+='<article class="round" data-status="'+r.status+'" id="round'+i+'">'+
+   '<div class="rhead"><div class="rtitle"><span class="rnum">'+(i+1)+'</span><div><h3>'+esc(R.v)+'</h3><div class="principle">'+esc(R.p)+'</div></div></div>'+
+   '<select data-i="'+i+'" data-f="status" aria-label="Status of round '+(i+1)+'"><option value="planned">Planned</option><option value="running">Running</option><option value="done">Done</option></select></div>'+
+   '<p class="learn"><b>What we learn.</b> '+esc(R.q)+'</p><p class="hyp"><b>Hypothesis.</b> '+esc(R.h)+'</p>'+
+   '<div class="variants"><div class="var"><span class="tag">ROUND '+(i+1)+' · CELL A'+(R.aw?' <span class="aw">('+esc(R.aw)+')</span>':'')+'</span><textarea data-i="'+i+'" data-f="a" aria-label="Variant A, round '+(i+1)+'" id="a'+i+'">'+esc(r.a)+'</textarea>'+psych(R.pa,R.ta)+'</div>'+
+   '<div class="var b"><span class="tag">ROUND '+(i+1)+' · CELL B</span><textarea data-i="'+i+'" data-f="b" aria-label="Variant B, round '+(i+1)+'" id="b'+i+'">'+esc(r.b)+'</textarea>'+psych(R.pb,R.tb)+'</div></div>'+
+   '<div class="stats"><div class="field"><label for="base'+i+'">Baseline %</label><input type="number" id="base'+i+'" data-i="'+i+'" data-f="base" min="0.1" step="0.1" value="'+r.base+'"></div>'+
+   '<div class="field"><label for="mde'+i+'">Target lift % (relative)</label><input type="number" id="mde'+i+'" data-i="'+i+'" data-f="mde" min="1" step="1" value="'+r.mde+'"></div>'+
+   '<div class="field"><span class="lbl">Sample needed</span><div class="feasbox" id="feas'+i+'">'+feas(c,i)+'</div></div></div>'+
+   
+   '<div class="meta"><span>Tested on: <b>'+esc(segLabel(c,R.s))+' group</b></span><span>Decides on: <b>'+esc(R.m)+'</b></span><span>Supporting signal: <b>'+(/^(Subject|Sender|Preview|Send)/.test(R.v)?'Clicks and open rate':'Clicks, open rate and unsubscribes')+'</b></span></div>'+
+   '<details class="res"'+(r.status!=="planned"?" open":"")+'><summary>Results'+(R.res?' (illustrative example, '+(R.resNote||'pooled over two sends')+')':'')+'</summary><div class="resbox">'+
+   '<div class="row4"><div class="field"><label for="nA'+i+'">Sent, cell A</label><input type="number" min="0" id="nA'+i+'" data-i="'+i+'" data-r="nA" value="'+esc(r.res.nA)+'"></div>'+
+   '<div class="field"><label for="xA'+i+'">Converted, cell A</label><input type="number" min="0" id="xA'+i+'" data-i="'+i+'" data-r="xA" value="'+esc(r.res.xA)+'"></div>'+
+   '<div class="field"><label for="nB'+i+'">Sent, cell B</label><input type="number" min="0" id="nB'+i+'" data-i="'+i+'" data-r="nB" value="'+esc(r.res.nB)+'"></div>'+
+   '<div class="field"><label for="xB'+i+'">Converted, cell B</label><input type="number" min="0" id="xB'+i+'" data-i="'+i+'" data-r="xB" value="'+esc(r.res.xB)+'"></div></div>'+
+   '<div class="verdict '+v.cls+'" id="ver'+i+'">'+v.html+'</div></div></details>'+
+   '</article>';});
+ $("map").innerHTML=h;
+ k.rounds.forEach(function(R,i){$("map").querySelector('select[data-i="'+i+'"]').value=state.cases[c].rounds[i].status;});}
+
+function renderLog(){var c=state.current,k=CASES[c],h="";
+ k.rounds.forEach(function(R,i){var v=verdict(c,i),r=state.cases[c].rounds[i];
+  var pill=v.win==="B"?'<span class="pill ok">'+esc(v.short)+'</span>':v.win==="A"?'<span class="pill ok">'+esc(v.short)+'</span>':v.win==="none"?'<span class="pill warn">'+esc(v.short)+'</span>':'<span class="pill mut">'+esc(r.status==="running"?"Running":"Not run yet")+'</span>';
+  h+='<tr><td class="mono">'+(i+1)+'</td><td>'+esc(R.v)+'</td><td>'+pill+'</td><td>'+esc(R.p)+'</td><td>'+((v.win==="A"||v.win==="B")?'<b>'+esc(R.apply)+'</b>':esc(R.apply))+'</td></tr>';});
+ $("log").innerHTML=h;}
+
+function renderAll(){var c=state.current;
+ document.querySelectorAll(".seg button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.case===c));});
+ renderSummary();renderMarkets();renderMap();renderLog();}
+
+function explain(i){var r=state.cases[state.current].rounds[i],t=r.base*(1+r.mde/100),n=nPerArm(r.base,r.mde);var R=CASES[state.current].rounds[i],src=/^Click rate/.test(R.m)?'<span class="src">Baseline: MailerLite 2025 email benchmarks, business and finance click rate (2.37%). Replace with your own past sends.</span>':'<span class="src">Baseline: assumption. Replace with your own past results for this action.</span>';return src+' Today about <b>'+r.base+'%</b> of partners do this. The test looks for <b>'+(Math.round(t*10)/10)+'%</b> or more with '+'Cell B'+'. To tell a real difference from chance, each cell needs about <b>'+(isFinite(n)?fmt(n):'?')+'</b> partners.';}
+function refreshRound(i){var c=state.current;$("feas"+i).innerHTML=feas(c,i);var v=verdict(c,i),el=$("ver"+i);el.className="verdict "+v.cls;el.innerHTML=v.html;$("round"+i).setAttribute("data-status",state.cases[c].rounds[i].status);renderSummary();renderLog();}
+
+document.querySelectorAll(".seg button").forEach(function(b){b.addEventListener("click",function(){state.current=b.dataset.case;save();renderAll();});});
+$("map").addEventListener("input",function(e){var t=e.target,i=+t.getAttribute("data-i");if(isNaN(i))return;var r=state.cases[state.current].rounds[i];
+ var f=t.getAttribute("data-f"),rf=t.getAttribute("data-r");
+ if(f==="a"||f==="b")r[f]=t.value;else if(f==="base"||f==="mde"){var n=parseFloat(t.value);if(!isNaN(n))r[f]=n;}
+ else if(rf){r.res[rf]=t.value===""?"":parseFloat(t.value);if(r.status==="planned"&&t.value!=="")r.status="running";$("map").querySelector('select[data-i="'+i+'"]').value=r.status;}
+ save();if(f!=="a"&&f!=="b")refreshRound(i);});
+$("map").addEventListener("change",function(e){var t=e.target;if(t.getAttribute("data-f")==="status"){var i=+t.getAttribute("data-i");state.cases[state.current].rounds[i].status=t.value;save();refreshRound(i);}});
+$("markets").addEventListener("input",function(e){var m=e.target.getAttribute("data-mk"),g=e.target.getAttribute("data-sg");if(!m||!g)return;var n=parseFloat(e.target.value);state.cases[state.current].markets[m][g]=isNaN(n)?0:Math.max(0,n);save();renderSummary();renderPool();CASES[state.current].rounds.forEach(function(R,i){$("feas"+i).innerHTML=feas(state.current,i);});});
+$("holdout").addEventListener("input",function(){var n=parseFloat($("holdout").value);if(isNaN(n))return;state.cases[state.current].holdout=Math.max(0,Math.min(30,n));save();renderSummary();renderMarkets();CASES[state.current].rounds.forEach(function(R,i){$("feas"+i).innerHTML=feas(state.current,i);});});
+$("reset").addEventListener("click",function(){var f=fresh();state.cases[state.current]=f.cases[state.current];save();renderAll();});
+
+renderAll();
+
+/* theme */
+var root=document.documentElement,lbl=document.getElementById("themelabel");
+function tget(){try{return localStorage.getItem("crmlab_theme")}catch(e){return null}}
+function tset(v){try{localStorage.setItem("crmlab_theme",v)}catch(e){}}
+function sysDark(){return window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches}
+function curDark(){var t=root.getAttribute("data-theme");return t?t==="dark":sysDark()}
+function setLabel(){lbl.textContent=curDark()?"Light mode":"Dark mode"}
+var tt=tget();if(tt==="dark"||tt==="light")root.setAttribute("data-theme",tt);
+setLabel();
+document.getElementById("themebtn").addEventListener("click",function(){var n=curDark()?"light":"dark";root.setAttribute("data-theme",n);tset(n);setLabel();});
+if(window.matchMedia)matchMedia("(prefers-color-scheme: dark)").addEventListener("change",setLabel);
+})();
+</script>
+
+</body></html>
