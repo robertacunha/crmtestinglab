@@ -1,940 +1,414 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Copy Audit Lab</title>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>B2B CRM Testing Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75,800;75,900&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Spline+Sans+Mono:wght@400;500&display=swap">
 <style>
-/* Layout idea: an editor's marked-up proof. Copy on the left gets blue-pencil edit marks, the verdict sits on a 0 to 100 ruler on the right, and six numbered heuristics follow like an audit report. */
-:root {
-  --bg: #f3f4f6;
-  --surface: #ffffff;
-  --raised: #f8f9fb;
-  --ink: #0d1014;
-  --muted: #5a6270;
-  --line: #dfe2e7;
-  --pencil: #7b5bd6;
-  --pencil-soft: rgba(123, 91, 214, .10);
-  --on-pencil: #ffffff;
-  --good: #23885a;
-  --warn: #b26f12;
-  --bad: #c2413b;
-  --font-display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
-  --font-body: "Public Sans", "Helvetica Neue", Arial, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
-  color-scheme: light;
+/* Layout: method and sample check on the left rail, eight-round test map as the main column, learning log below. Same tokens as the Partner Campaign Desk. */
+:root{
+  --bg:#ECEEF1; --surface:#FAFBFC; --surface2:#E1E5EA; --ink:#141820; --muted:#545C66; --line:#CBD1D9; --chip:#E1E5EA;
+  --accent:#C22770; --accent-text:#A11E5C; --accent-ink:#FFFFFF; --accent-soft:#F7DDE9;
+  --ok:#2C7650; --ok-soft:#E1EFE6; --warn:#8F580B; --warn-soft:#F6EAD3; --crit:#AE3434; --crit-soft:#F5DFDF;
+  --f-display:"Inter","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Public Sans","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"Spline Sans Mono",ui-monospace,Menlo,Consolas,monospace;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0d1014; --surface: #141920; --raised: #1a2029; --ink: #eceef1; --muted: #8e97a6; --line: #262d38;
-    --pencil: #c3b1ff; --pencil-soft: rgba(195, 177, 255, .14); --on-pencil: #0d1014;
-    --good: #4fcb8e; --warn: #f2b451; --bad: #f2766e;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #0d1014; --surface: #141920; --raised: #1a2029; --ink: #eceef1; --muted: #8e97a6; --line: #262d38;
-  --pencil: #c3b1ff; --pencil-soft: rgba(195, 177, 255, .14); --on-pencil: #0d1014;
-  --good: #4fcb8e; --warn: #f2b451; --bad: #f2766e;
-  color-scheme: dark;
-}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1217; --surface:#161B22; --surface2:#1D242D; --ink:#E6EAF0; --muted:#9BA5B1; --line:#2A323C; --chip:#1D242D;
+  --accent:#EE76AE; --accent-text:#F59AC5; --accent-ink:#0F1217; --accent-soft:#3A1E2C;
+  --ok:#72C79A; --ok-soft:#18291F; --warn:#E5AD52; --warn-soft:#30261A; --crit:#EF8383; --crit-soft:#341C1E; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1217; --surface:#161B22; --surface2:#1D242D; --ink:#E6EAF0; --muted:#9BA5B1; --line:#2A323C; --chip:#1D242D;
+  --accent:#EE76AE; --accent-text:#F59AC5; --accent-ink:#0F1217; --accent-soft:#3A1E2C;
+  --ok:#72C79A; --ok-soft:#18291F; --warn:#E5AD52; --warn-soft:#30261A; --crit:#EF8383; --crit-soft:#341C1E; color-scheme:dark}
 
-* { box-sizing: border-box; }
-[hidden] { display: none !important; }
-.bench > .field { align-content: start; }
-html, body { margin: 0; }
-body { background: var(--bg); color: var(--ink); font: 15px/1.6 var(--font-body); -webkit-font-smoothing: antialiased; }
-.wrap { max-width: 1200px; margin: 0 auto; padding: 20px 24px 80px; display: grid; gap: 28px; }
-a { color: var(--pencil); text-underline-offset: 3px; }
-:focus-visible { outline: 2px solid var(--pencil); outline-offset: 2px; border-radius: 4px; }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:20px 48px}
+.wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{text-wrap:balance;margin:0}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+a{color:var(--accent-text)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-/* Controls */
-button, select, input, textarea { font: inherit; color: inherit; }
-button { cursor: pointer; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 16px; font-weight: 500; font-size: 14px; transition: border-color .15s, background .15s; }
-button:hover { border-color: var(--pencil); }
-button.primary { background: var(--pencil); border-color: var(--pencil); color: var(--on-pencil); font-weight: 600; }
-button.primary:hover { filter: brightness(1.08); }
-button.ghost { border-color: transparent; background: transparent; color: var(--muted); padding: 8px 10px; }
-button.ghost:hover { color: var(--ink); }
-button:disabled { opacity: .45; cursor: not-allowed; }
-textarea, select, input[type="number"], input[type="password"] { border: 1px solid var(--line); border-radius: 10px; background: var(--raised); padding: 10px 12px; }
-textarea { width: 100%; resize: vertical; line-height: 1.6; }
-textarea:focus, select:focus, input:focus { border-color: var(--pencil); outline: none; box-shadow: 0 0 0 3px var(--pencil-soft); }
-label, .label { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--pencil); }
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);padding-bottom:16px}
+header.top h1{font-family:var(--f-display);font-weight:400;font-size:clamp(34px,5vw,48px);line-height:1}
+header.top h1 em{color:var(--accent)}
+.forline{font-family:var(--f-display);font-weight:400;font-size:clamp(34px,5vw,48px);line-height:1;color:var(--ink);margin-top:4px}
+.forline .brand{color:var(--accent)}
+header.top p{margin:8px 0 0;color:var(--muted);max-width:64ch}
+.side{display:flex;flex-direction:column;gap:8px;min-width:0}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font:inherit;font-size:13.5px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 12px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.sister{font-size:13.5px;font-weight:600}
+.tagrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.tagline{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);font-weight:500}
+.tagline .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none}
+.byline{display:inline-block;border:1.5px solid var(--ink);border-radius:999px;padding:6px 16px;font-weight:700;font-size:14px;line-height:1.2}
+.themebtn{margin-left:auto;display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);border-radius:999px;padding:6px 14px;font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.themebtn:hover{border-color:var(--accent);color:var(--accent-text)}
+.themebtn .ti{width:14px;height:14px;border-radius:50%;border:1.5px solid currentColor;background:linear-gradient(90deg,currentColor 50%,transparent 50%)}
 
-/* Type */
-h1 { font-family: var(--font-display); font-weight: 900; font-stretch: 75%; font-size: clamp(48px, 7.4vw, 96px); line-height: .9; letter-spacing: -0.01em; text-transform: uppercase; margin: 0; }
-em { font-style: normal; }
-.hl { color: var(--pencil); }
-h2 { font-family: var(--font-display); font-weight: 900; font-stretch: 75%; font-size: 32px; line-height: 1; letter-spacing: 0; text-transform: uppercase; margin: 0; text-wrap: balance; }
-h3 { font-family: var(--font-body); font-weight: 700; font-size: 18px; letter-spacing: -0.01em; margin: 0; }
-p { margin: 0; }
-.lede { color: var(--muted); font-size: 17px; max-width: 62ch; }
-.small { font-size: 13px; color: var(--muted); }
-.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.note{font-size:13px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:8px;padding:10px 12px}
 
-/* Top bar */
-.topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.labtag { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-.pill { display: inline-flex; align-items: center; padding: 5px 14px; border-radius: 999px; border: 1.5px solid var(--ink); font-size: 14px; font-weight: 700; letter-spacing: -0.005em; }
-.lab-meta { display: inline-flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
-.lab-meta::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--pencil); }
-.theme-btn { display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; border: 1.5px solid var(--ink); border-radius: 999px; background: transparent; font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; }
-.theme-btn:hover { border-color: var(--pencil); }
-.theme-btn svg { width: 14px; height: 14px; flex: none; }
+.grid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:920px){.grid{grid-template-columns:minmax(0,1fr)}}
+.rail{display:flex;flex-direction:column;gap:16px;min-width:0}
+@media (min-width:921px){.rail{position:sticky;top:calc(env(safe-area-inset-top, 0px) + 12px)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.panel h2{font-family:var(--f-display);font-weight:400;font-size:26px;line-height:1.1}
+.rules{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.rules li::marker{color:var(--accent-text);font-weight:700}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-size:12px;font-weight:600;color:var(--muted)}
+input[type=text],input[type=number],select,textarea{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%}
+input[type=number]{font-family:var(--f-mono)}
+textarea{resize:vertical;min-height:54px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:520px){.row4{grid-template-columns:1fr 1fr}}
+.mkin{display:grid;grid-template-columns:36px 1fr auto;gap:6px 10px;align-items:center;font-size:13.5px}
+.hint{font-size:12px;color:var(--muted)}
+.segdefs{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+.segdefs b{color:var(--ink)}
+.segnote{margin-top:4px;padding-top:6px;border-top:1px solid var(--line)}
+.src{display:block;font-size:12px;margin-bottom:2px}
+.mk{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;font-size:13.5px;align-items:center}
+.mk .bar{height:8px;background:var(--line);border-radius:999px;overflow:hidden}
+.mk .bar i{display:block;height:100%;background:var(--accent)}
 
-/* Hero */
-.hero { display: grid; grid-template-columns: 1.3fr 1fr; gap: 32px; align-items: end; padding: 28px 0 6px; border-bottom: 1px solid var(--line); padding-bottom: 28px; }
-.hero-text { display: grid; gap: 16px; }
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-left: 1px solid var(--line); }
-.stat { padding: 4px 18px; border-right: 1px solid var(--line); display: grid; gap: 4px; }
-.stat:last-child { border-right: 0; }
-.stat b { font-family: var(--font-display); font-stretch: 75%; font-size: 46px; font-weight: 900; letter-spacing: 0; line-height: 1; font-variant-numeric: tabular-nums; }
-.stat span { font-size: 13px; color: var(--muted); line-height: 1.35; }
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.crit{background:var(--crit-soft);color:var(--crit)} .pill.acc{background:var(--accent-soft);color:var(--accent-text)} .pill.mut{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
 
-/* Panels */
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 24px; display: grid; gap: 16px; align-content: start; }
-.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.field { display: grid; gap: 8px; }
-.chip { font-family: var(--font-mono); font-size: 11px; letter-spacing: .04em; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
-.chip.example { border-color: var(--warn); color: var(--warn); }
-.chip.src-you { border-color: var(--pencil); color: var(--pencil); }
-.chip.src-auto { border-style: dashed; }
-.chip.src-ai { background: var(--pencil-soft); border-color: transparent; color: var(--pencil); }
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.sum{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0}
+.sum b{display:block;font-size:22px;font-weight:600}
+.sum span{font-size:12.5px;color:var(--muted)}
 
-/* Workspace */
-.workspace { display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px; }
-#copyInput { min-height: 236px; font-size: 16px; }
+.map{display:flex;flex-direction:column;gap:14px;min-width:0}
+.round{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.round[data-status="done"]{border-color:var(--ok)}
+.rhead{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between}
+.rhead select{width:auto;min-width:120px}
+.rtitle{display:flex;align-items:baseline;gap:12px;min-width:0}
+.rnum{font-family:var(--f-display);font-size:34px;color:var(--accent);line-height:.9;min-width:30px}
+.rtitle h3{font-size:17px;font-weight:700}
+.rtitle .principle{font-size:12.5px;color:var(--muted)}
+.hyp{font-size:14px;margin:0;border-left:2px solid var(--accent);padding-left:10px}
+.variants{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:620px){.variants{grid-template-columns:1fr}}
+.var{border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
+.var .sendname{font-size:11px;color:var(--muted);word-break:break-all}
+.var .cellp{font-size:12.5px;color:var(--ink);font-weight:500}
+.var .cellp::before{content:"Principle: ";color:var(--muted);font-weight:400}
+.var .aw{color:var(--ok);text-transform:none;letter-spacing:0}
+.psy{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.plab{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-text);font-weight:500}
+.pval{font-size:14.5px;color:var(--ink);margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--chip);color:var(--ink);font-size:13px;padding:4px 10px;border-radius:6px}
+.flight{display:flex;flex-direction:column;gap:2px;padding:4px 2px}
+.flight p{margin:0;font-size:13.5px;color:var(--muted)}
+.learn{margin:0;font-size:14.5px}
+.learn b{color:var(--accent-text)}
+.var .tag{font-family:var(--f-mono);font-size:11.5px;font-weight:600;color:var(--accent-text)}
+.var textarea{background:var(--surface);min-height:84px}
+.stats{display:grid;grid-template-columns:110px 160px minmax(0,1fr);gap:10px;align-items:end}
+@media (max-width:520px){.stats{grid-template-columns:1fr 1fr}.stats .field:last-child{grid-column:span 2}}
+.lbl{font-size:12px;font-weight:600;color:var(--muted)}
+.feasbox{min-height:36px;display:flex;align-items:center}
+.explain{margin:0;font-size:13px;color:var(--muted)}
+.explain b{color:var(--ink);font-weight:600}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
+.meta b{color:var(--ink);font-weight:600}
+details.res summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--accent-text)}
+.resbox{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.verdict{font-size:14px;border-radius:8px;padding:9px 12px;background:var(--bg)}
+.verdict.win{background:var(--ok-soft)} .verdict.lose{background:var(--crit-soft)} .verdict.flat{background:var(--warn-soft)}
+.guard{font-size:12.5px;color:var(--muted)}
 
-/* Score */
-.score { position: relative; overflow: hidden; }
-.score-num { display: flex; align-items: baseline; gap: 10px; }
-.big { font-family: var(--font-display); font-weight: 900; font-stretch: 75%; font-size: clamp(96px, 11vw, 144px); line-height: .85; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
-.of { font-family: var(--font-mono); color: var(--muted); font-size: 14px; }
-.tabs { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 999px; background: var(--raised); justify-self: start; }
-.tabs button { border: 0; border-radius: 999px; padding: 6px 16px; background: transparent; }
-.tabs button[aria-selected="true"] { background: var(--ink); color: var(--surface); font-weight: 600; }
-#aiRewriteInput { min-height: 236px; font-size: 16px; line-height: 1.9; }
-#aiInstr { width: 100%; border: 1px solid var(--line); border-radius: 10px; background: var(--raised); padding: 10px 12px; }
-.breakdown-tools { justify-content: flex-end; }
-.gaps { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--warn); }
-.gaps[data-zero="true"] { color: var(--good); }
-.flag-inline { font-size: 13px; color: var(--warn); }
-.kind { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: 2px 8px; border-radius: 6px; border: 1.5px dashed var(--muted); color: var(--muted); }
-.meter.na, .h-card.na { opacity: .5; }
-.h-card.na { padding-top: 16px; padding-bottom: 16px; }
-.verdict { font-family: var(--font-body); font-weight: 700; font-size: 20px; letter-spacing: -0.01em; line-height: 1.25; }
-.ruler { position: relative; padding-top: 18px; }
-.ruler-track { display: grid; grid-template-columns: 50fr 25fr 25fr; height: 10px; border-radius: 999px; overflow: hidden; gap: 2px; }
-.ruler-track span:nth-child(1) { background: color-mix(in srgb, var(--bad) 55%, transparent); }
-.ruler-track span:nth-child(2) { background: color-mix(in srgb, var(--warn) 55%, transparent); }
-.ruler-track span:nth-child(3) { background: color-mix(in srgb, var(--good) 55%, transparent); }
-.ruler-marker { position: absolute; top: 0; width: 2px; height: 32px; background: var(--ink); transform: translateX(-1px); transition: left .6s cubic-bezier(.2,.8,.2,1); }
-.ruler-marker::before { content: ""; position: absolute; top: -2px; left: -5px; border: 6px solid transparent; border-top-color: var(--ink); }
-.ruler-ticks { position: relative; height: 18px; margin-top: 6px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
-.ruler-ticks span { position: absolute; transform: translateX(-50%); }
-.ruler-ticks span:first-child { transform: none; }
-.ruler-ticks span:last-child { transform: translateX(-100%); }
-.meters { display: grid; gap: 10px; border-top: 1px solid var(--line); padding-top: 16px; }
-.meter { display: grid; grid-template-columns: 26px 1fr auto 118px; gap: 10px; align-items: center; font-size: 14px; }
-.meter .n { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
-.cells { display: grid; grid-template-columns: repeat(3, 14px); gap: 3px; }
-.cells i { height: 14px; border-radius: 3px; background: var(--raised); border: 1px solid var(--line); }
-.cells[data-v="0"] i:nth-child(1) { background: var(--bad); border-color: var(--bad); }
-.cells[data-v="1"] i:nth-child(-n+2) { background: var(--warn); border-color: var(--warn); }
-.cells[data-v="2"] i { background: var(--good); border-color: var(--good); }
-.meter .src { text-align: right; font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
-.flag { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; padding: 12px 14px; border-radius: 12px; background: var(--raised); border: 1px dashed var(--line); font-size: 14px; }
-.flag b { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--warn); padding-top: 2px; }
-
-/* Heuristic cards */
-.section-head { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: end; }
-.section-head p { max-width: 64ch; }
-.legend { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.hlist { display: grid; gap: 14px; }
-.h-card { display: grid; grid-template-columns: 88px 1.1fr 1fr; gap: 24px; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px 24px; position: relative; }
-.h-card::before { content: ""; position: absolute; left: 0; top: 22px; bottom: 22px; width: 3px; border-radius: 0 3px 3px 0; background: var(--line); }
-.h-card[data-level="0"]::before { background: var(--bad); }
-.h-card[data-level="1"]::before { background: var(--warn); }
-.h-card[data-level="2"]::before { background: var(--good); }
-.h-num { font-family: var(--font-display); font-weight: 900; font-stretch: 75%; font-size: 52px; line-height: .9; letter-spacing: 0; color: var(--pencil); opacity: 1; font-variant-numeric: tabular-nums; }
-.h-main, .h-side { display: grid; gap: 10px; align-content: start; }
-.h-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-.stamp { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; padding: 4px 10px; border-radius: 6px; border: 1.5px solid currentColor; }
-.stamp.l0 { color: var(--bad); } .stamp.l1 { color: var(--warn); } .stamp.l2 { color: var(--good); } .stamp.ln { color: var(--muted); border-style: dashed; }
-.q { font-size: 16px; line-height: 1.5; }
-.source { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
-.signals { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 14px; }
-.signals li { padding-left: 16px; position: relative; }
-.signals li::before { content: ""; position: absolute; left: 0; top: .62em; width: 6px; height: 6px; border-radius: 50%; background: var(--pencil); opacity: .7; }
-.seg { display: inline-grid; grid-template-columns: repeat(3, auto); border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; background: var(--raised); }
-.seg button { border: 0; border-radius: 999px; padding: 6px 14px; font-size: 13px; background: transparent; }
-.seg button[aria-pressed="true"][data-v="0"] { background: var(--bad); color: var(--surface); }
-.seg button[aria-pressed="true"][data-v="1"] { background: var(--warn); color: var(--surface); }
-.seg button[aria-pressed="true"][data-v="2"] { background: var(--good); color: var(--surface); }
-.ai-note { font-size: 14px; background: var(--pencil-soft); border-radius: 12px; padding: 12px 14px; display: grid; gap: 4px; }
-.ai-note .label { color: var(--pencil); }
-.checklist { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 14px; }
-.checklist li { display: grid; grid-template-columns: 12px 1fr; gap: 8px; }
-.checklist li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--pencil); opacity: .7; margin-top: .6em; justify-self: center; }
-.keep { font-weight: 600; font-size: 15px; color: var(--good); }
-
-/* Bench */
-.bench { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.proof { white-space: pre-wrap; border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; background: var(--raised); min-height: 236px; font-size: 16px; line-height: 1.9; }
-#rewriteInput { min-height: 236px; font-size: 16px; line-height: 1.9; }
-mark { background: transparent; color: inherit; padding: 0 1px; }
-mark.buzz { text-decoration: line-through; text-decoration-color: var(--pencil); text-decoration-thickness: 2px; background: var(--pencil-soft); border-radius: 3px; }
-mark.vague { text-decoration: underline wavy var(--warn); text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
-mark.cta { outline: 1.5px solid var(--pencil); outline-offset: 1px; border-radius: 4px; }
-mark.signal { text-decoration: underline dotted var(--good); text-decoration-thickness: 2px; text-underline-offset: 4px; }
-.key { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
-.key mark { font-size: 13px; }
-.table-wrap { overflow-x: auto; }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); }
-th { font-family: var(--font-mono); font-weight: 500; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-td.num, th.num { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
-.better { color: var(--good); font-weight: 600; } .worse { color: var(--bad); font-weight: 600; } .same { color: var(--muted); }
-
-/* Critique */
-.status { font-size: 14px; color: var(--muted); }
-.status::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); margin-right: 8px; vertical-align: 1px; }
-.status[data-on="true"]::before { background: var(--good); }
-
-
-/* Method */
-.method { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-.method p { font-size: 14px; color: var(--muted); max-width: 62ch; }
-.method p strong { color: var(--ink); font-weight: 600; }
-footer { font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 18px; }
-
-/* Load sequence */
-@media (prefers-reduced-motion: no-preference) {
-  .reveal { animation: rise .6s cubic-bezier(.2,.8,.2,1) both; }
-  .reveal.d1 { animation-delay: .06s; } .reveal.d2 { animation-delay: .12s; } .reveal.d3 { animation-delay: .18s; }
-  @keyframes rise { from { transform: translateY(8px); } to { transform: none; } }
-}
-@media (prefers-reduced-motion: reduce) { .ruler-marker { transition: none; } }
-
-@media (max-width: 920px) {
-  .hero, .workspace, .bench, .method { grid-template-columns: 1fr; }
-  .h-card { grid-template-columns: 1fr; gap: 14px; }
-  .h-num { font-size: 32px; }
-    .section-head { grid-template-columns: 1fr; }
-}
-@media (max-width: 480px) {
-  .wrap { padding: 16px 16px 64px; }
-  .panel { padding: 18px; }
-  .stats { grid-template-columns: 1fr; border-left: 0; }
-  .stat { border-right: 0; border-bottom: 1px solid var(--line); padding: 10px 0; }
-  .meter { grid-template-columns: 22px 1fr auto; }
-  .meter .src { display: none; }
-}
+table.log{width:100%;border-collapse:collapse;font-size:13.5px}
+table.log th,table.log td{text-align:left;padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+table.log th{font-size:12px;color:var(--muted);font-weight:600}
+.scroll{overflow-x:auto}
+footer.foot{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:6px}
+.btn{font:inherit;font-size:13px;font-weight:600;border-radius:8px;padding:7px 12px;cursor:pointer;border:1px solid var(--accent-text);background:transparent;color:var(--accent-text)}
+/* structured layer */
+body{font-size:15.5px}
+.wrap{gap:24px}
+header.top{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;align-items:start;border-bottom:0;padding-bottom:0}
+header.top .eyebrow,.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-text);font-weight:500}
+header.top h1{font-family:var(--f-display);font-weight:800;font-size:clamp(40px,6.4vw,78px);line-height:1;letter-spacing:-.025em;margin-top:8px}
+header.top h1 span{color:var(--accent)}
+header.top p{font-size:17px;max-width:68ch;margin-top:12px}
+.side{gap:10px}
+.seg{gap:0;border:1.5px solid var(--ink);border-radius:4px;overflow:hidden;width:max-content;max-width:100%}
+.seg button{border:0;border-right:1.5px solid var(--ink);border-radius:0;background:transparent;font-size:13.5px;font-weight:600;padding:9px 14px}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+@media (max-width:760px){.seg{width:100%;flex-direction:column}.seg button{border-right:0;border-bottom:1.5px solid var(--ink);text-align:left}.seg button:last-child{border-bottom:0}}
+.summary{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.5fr) repeat(3,minmax(0,1fr));gap:0;background:var(--surface);border:1.5px solid var(--ink);border-radius:4px}
+.sum{border:0;border-right:1px solid var(--line);border-radius:0;background:transparent;padding:16px 18px;display:flex;flex-direction:column;gap:8px}
+.sum:last-child{border-right:0}
+.sum .k{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-text);font-weight:500}
+.sum .t{font-size:17px;font-weight:700;line-height:1.3;color:var(--ink)}
+.sum .n{color:var(--ink)}
+.sum .n{font-family:var(--f-display);font-weight:800;font-size:32px;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.sum .n small{font-size:20px;color:var(--muted);font-weight:700}
+.sum .c{font-size:12.5px;color:var(--muted);line-height:1.4}
+.sum .bar{height:6px;background:var(--surface2);border-radius:0;overflow:hidden}
+.sum .bar i{display:block;height:100%;background:var(--accent)}
+@media (max-width:980px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.sum{border-bottom:1px solid var(--line)}.sum:nth-child(2n){border-right:0}.sum:first-child{grid-column:span 2;border-right:0}}
+@media (max-width:520px){.summary{grid-template-columns:minmax(0,1fr)}.sum,.sum:first-child{grid-column:auto;border-right:0}}
+.panel,.round{border-radius:4px;border-color:var(--line)}
+.panel h2{font-family:var(--f-display);font-weight:700;font-size:25px;line-height:1.1;letter-spacing:-.01em}
+.rnum{font-family:var(--f-display);font-weight:800;font-size:34px;line-height:1;min-width:30px;color:var(--accent)}
+.rtitle h3{font-size:17px;font-weight:700}
+.var{border-radius:4px;background:var(--bg)}
+.var .tag{font-family:var(--f-mono)}
+.chip{border-radius:3px;background:var(--chip)}
+input[type=text],input[type=number],select,textarea{border-radius:4px}
+.verdict{border-radius:4px}
+.btn{border-radius:4px}
+.flight .eyebrow{color:var(--accent-text)}
+footer.labfoot{margin-top:48px;padding-top:20px;border-top:1.5px solid var(--line);font-size:13px;color:var(--muted);max-width:110ch;line-height:1.55}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
-</head>
-<body>
-<div class="wrap">
-  <div class="topbar">
-    <div class="labtag">
-      <span class="pill">Audit lab by Simplificate</span>
-      <span class="lab-meta">Ad copy · Landing pages · Scorecard</span>
-    </div>
-    <button id="themeToggle" class="theme-btn" type="button" aria-label="Switch colour theme"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg><span id="themeLabel">Dark mode</span></button>
-  </div>
 
-  <header class="hero">
-    <div class="hero-text reveal">
-      <h1><span class="hl">Copy Audit</span><br>Lab</h1>
-      <p class="lede">Check your copy before you put budget behind it. People act on copy that sounds like someone listened to them. Paste an ad, a headline or a landing page. The scorecard marks vague claims, rates six behavioral heuristics from published research and turns each gap into a rewrite checklist.</p>
-    </div>
-    <div class="stats reveal d1" aria-label="What the scorecard is built on">
-      <div class="stat"><b>6</b><span>heuristics scored</span></div>
-      <div class="stat"><b>12</b><span>published sources</span></div>
-      <div class="stat"><b>4</b><span>copy types: ads, headlines, landing pages, emails</span></div>
+<div class="wrap">
+  <div class="tagrow">
+    <span class="byline">CRM lab by Simplificate</span>
+    <span class="tagline"><i class="dot" aria-hidden="true"></i>For B2B salon software platforms</span>
+    <button class="themebtn" id="themebtn" type="button"><span class="ti" aria-hidden="true"></span><span id="themelabel">Dark mode</span></button>
+  </div>
+  <header class="top">
+    <div>
+      <h1>CRM Testing <span>Lab</span></h1>
+      <p>Eight rounds, one variable per round. Each test has a hypothesis, a behavioural principle, a sample check before it runs and a decision rule after. What wins goes into the learning log and into the next send.</p>
     </div>
   </header>
 
-  <section class="workspace">
-    <div class="panel reveal d1">
-      <div class="panel-head">
-        <h2>Copy to audit</h2>
-        <span class="chip example" id="exampleTag">Example copy</span>
-      </div>
-      <div class="row">
-        <div class="field">
-          <label for="copyType">Copy type</label>
-          <select id="copyType">
-            <option value="ad">Ad copy</option>
-            <option value="headline">Headline</option>
-            <option value="landing">Landing page text</option>
-            <option value="email">Email</option>
-          </select>
-        </div>
-      </div>
-      <div class="field">
-        <label for="copyInput">Copy, English, one element per line</label>
-        <textarea id="copyInput" spellcheck="true"></textarea>
-        <p class="flag-inline" id="langNote" hidden></p>
-      </div>
-      <div class="row">
-        <button class="primary" id="scoreBtn" type="button">Score copy</button>
-        <button id="exampleBtn" type="button">Load example</button>
-        <button class="ghost" id="clearBtn" type="button">Clear</button>
-      </div>
-    </div>
+  <div class="summary" id="summary"></div>
 
-    <div class="panel score reveal d2" aria-live="polite">
-      <div class="panel-head">
-        <span class="row" style="gap:8px"><span class="label">Readiness score</span><span class="kind" id="scoreKind">Draft</span></span>
-        <span class="small mono" id="coverage"></span>
-      </div>
-      <div class="score-num" id="scoreBox" data-final="false"><span class="big" id="scoreNum">0</span><span class="of">/ 100</span></div>
-      <div class="verdict" id="verdict"></div>
-      <div class="ruler" aria-hidden="true">
-        <div class="ruler-marker" id="marker" style="left:0%"></div>
-        <div class="ruler-track"><span></span><span></span><span></span></div>
-        <div class="ruler-ticks"><span style="left:0%">0</span><span style="left:50%">50</span><span style="left:75%">75</span><span style="left:100%">100</span></div>
-      </div>
-      <div class="meters" id="meters"></div>
-      <div class="flag" id="choiceFlag"></div>
-    </div>
-  </section>
+  <div class="grid">
+    <aside class="rail">
+      <section class="panel">
+        <div class="eyebrow">The method</div>
+        <h2>Rules for every test</h2>
+        <ol class="rules">
+          <li>Flight 1 is for learning. Each round answers one question about what partners need and value.</li>
+          <li><b>Frequency cap.</b> At most one adoption email per partner per week, across all campaigns. Service messages are exempt, and onboarding journeys follow their own timing. A partner can join several rounds over time but never sees the same test twice, and nothing is carried over from one round to the next.</li>
+          <li><b>Exclusions.</b> Each send leaves out partners who already subscribed, the holdout, and partners in another test that week. Service messages run without a holdout, since every partner must receive them. A sunset rule leaves out partners who have not opened any of our emails in 90 days: they are reached in-app or by an Account Manager.</li>
+          <li>One variable per round. Everything else stays the same. Before each send, a second CRM executive checks both cells (buddy check).</li>
+          <li>Split at random at company level, so every user in a salon gets the same cell, with a test property on the company in HubSpot. Compare cells only within the same group and market.</li>
+          <li>Write the hypothesis and the principle before the send, and name the group it is tested on.</li>
+          <li>Check the sample first. If a group is too small for one send, spread Flight 1 over more sends, at least a week apart. Pool markets only when the copy is the same concept in each language, and split cells within each market.</li>
+          <li>The goal decides: the version that gets more partners to take the action we want wins. Clicks and opens are supporting signals only, and Apple Mail Privacy Protection inflates opens.</li>
+          <li>Log a learning when the sample is reached and the result is significant at 95%, or earlier only if the result is overwhelming (p &lt; 0.001). Otherwise partners did not respond differently, and the choice matters less.</li>
+          <li>Watch the guardrails: unsubscribes and spam complaints under 0.1%, never above 0.3% (Gmail's limit).</li>
+          <li>Legal and compliance wording is never tested. Only framing, order and timing.</li>
+        </ol>
+      </section>
 
-  <section class="hsection" style="display:grid;gap:18px">
-    <div class="section-head">
-      <div style="display:grid;gap:8px">
-        <h2>Heuristic breakdown</h2>
-        <p class="small">Rate each heuristic Missing, Partial or Present. Your rating overrides the rules. Loss framing and status quo friction have no automated suggestion, because keyword rules cannot judge framing. Rewrite with AI in the bench below to get AI ratings as well.</p>
-      </div>
-      <div class="row breakdown-tools">
-        <span class="gaps" id="gapCount"></span>
-        <div class="tabs" role="group" aria-label="Which heuristics to show">
-          <button type="button" id="viewAll" aria-selected="true">All</button>
-          <button type="button" id="viewGaps" aria-selected="false">Gaps only</button>
-        </div>
-        <button id="applyAiBtn" type="button" hidden>Use AI ratings where I have not rated</button>
-      </div>
-    </div>
-    <div class="hlist" id="heuristics"></div>
-  </section>
+      <section class="panel">
+        <div class="eyebrow">Sample check</div>
+        <h2 id="poolTitle">Who is in the test</h2>
+        <div class="segdefs" id="segdefs"></div>
+        <div class="field"><label for="holdout">Holdout kept out of all sends (%)</label><input type="number" id="holdout" min="0" max="30" step="1"></div>
+        <div class="mkin" id="markets"></div>
+        <p class="guard" id="poolNote"></p>
+      </section>
+    </aside>
+
+    <main class="map" id="map" aria-live="polite"></main>
+  </div>
 
   <section class="panel">
-    <div class="panel-head">
-      <h2>Rewrite bench</h2>
-      <div class="legend">
-        <span class="key"><mark class="buzz">buzzword</mark></span>
-        <span class="key"><mark class="vague">vague proof</mark></span>
-        <span class="key"><mark class="cta">vague CTA</mark></span>
-        <span class="key"><mark class="signal">loss or switching cue</mark></span>
-      </div>
-    </div>
-    <div class="bench">
-      <div class="field">
-        <span class="label">Original, marked up</span>
-        <div class="proof" id="highlighted"></div>
-      </div>
-      <div class="field">
-        <div class="tabs" role="tablist" aria-label="Rewrite version">
-          <button type="button" role="tab" id="tabMine" aria-selected="true" aria-controls="paneMine">My rewrite</button>
-          <button type="button" role="tab" id="tabAi" aria-selected="false" aria-controls="paneAi">AI rewrite</button>
-        </div>
-        <div id="paneMine" role="tabpanel" aria-labelledby="tabMine" class="field">
-          <textarea id="rewriteInput" aria-label="My rewrite" placeholder="Write your rewrite here. The comparison below updates as you type."></textarea>
-        </div>
-        <div id="paneAi" role="tabpanel" aria-labelledby="tabAi" class="field" hidden>
-          <textarea id="aiRewriteInput" aria-label="AI rewrite" placeholder="The AI rewrite appears here. You can edit it directly."></textarea>
-          <div class="field">
-            <label for="aiInstr">Direction for the AI (optional)</label>
-            <input type="text" id="aiInstr" maxlength="400" placeholder="For example: shorter, aimed at CFOs, stronger loss framing, keep the CTA">
-          </div>
-          <div class="row">
-            <button class="primary" id="aiRunBtn" type="button" disabled>Rewrite with AI</button>
-            <button id="aiRefineBtn" type="button" disabled hidden>Refine this version</button>
-            <span class="field" id="passWrap" hidden>
-              <label for="passcode">Access code</label>
-              <input type="password" id="passcode" autocomplete="off">
-            </span>
-          </div>
-          <span class="status" id="aiStatus">Checking for an AI connection…</span>
-        </div>
-        <div class="row"><button id="promoteBtn" type="button">Score this version as main copy</button></div>
-      </div>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Automated check</th><th class="num">Original</th><th class="num" id="compareHead">My rewrite</th><th>Direction</th></tr></thead>
-        <tbody id="compareBody"></tbody>
-      </table>
-    </div>
+    <div class="eyebrow">Learning log</div>
+    <h2>What we learned, and where it goes next</h2>
+    <div class="scroll"><table class="log"><thead><tr><th>Round</th><th>Variable</th><th>Result</th><th>Principle</th><th>Apply to</th></tr></thead><tbody id="log"></tbody></table></div>
+    <div><button type="button" class="btn" id="reset">Reset this case to the example</button></div>
   </section>
 
-  <section class="panel">
-    <h2>How the score works</h2>
-    <div class="method">
-      <p><strong>Ratings.</strong> Each heuristic is rated Missing (0), Partial (1) or Present (2). The copy type decides which heuristics apply: headlines are scored on loss framing, processing fluency and concrete specificity, and other copy types on all six. The readiness score is the average out of 100, with every heuristic weighted the same. Your rating counts first, then the automated suggestion. The score stays a draft until every applicable heuristic is rated. The score is a checklist index. It has not yet been checked against campaign results, so it does not predict CTR or conversion.</p>
-      <p><strong>What is research and what is tool logic.</strong> Processing fluency uses the published Flesch Reading Ease bands: 60 and above is plain English, 30 to 59 is fairly difficult to difficult, below 30 is very difficult. The pattern rules for social proof, CTA friction and concrete specificity, which heuristics apply to headlines, and the verdict bands at 50 and 75 on the ruler, are tool logic, not research findings.</p>
-    </div>
-  </section>
-
-  <footer>
-    <span>Copy Audit Lab, version 1</span>
-  </footer>
+  <footer class="labfoot">CRM lab by Simplificate, the lifecycle testing module of the Simplificate growth methodology. It finds what partners respond to across onboarding, launches, reactive and lifecycle sends, one variable per round. Products, partner counts, baselines and results are illustrative, to show how the method reads real data. Significance uses a two-proportion z-test at 95% and sample sizes assume 80% power. Your edits are kept in this browser only.</footer>
 </div>
 
 <script>
+(function(){
 "use strict";
-
-/* ---------- Heuristic definitions ---------- */
-const HEURISTICS = [
-  { id: "loss", name: "Loss framing", source: "Kahneman & Tversky 1979; Tversky & Kahneman 1981", tier: "Research", mode: "Self-rated + AI",
-    question: "Does the copy name what the reader loses, risks or keeps paying for by not acting?",
-    fixes: ["Name the cost of inaction in the reader's own terms: hours, budget, missed pipeline.", "Write the same outcome as a loss avoided and test it against the gain version."] },
-  { id: "sq", name: "Status quo friction", source: "Samuelson & Zeckhauser 1988", tier: "Research", mode: "Self-rated + AI",
-    question: "Does the copy address the cost of staying put and lower the risk of switching?",
-    fixes: ["Name the current workaround (spreadsheets, the old tool, the agency) and what it costs.", "Remove switching risk: migration help, free trial, cancel anytime, guarantee."] },
-  { id: "proof", name: "Social proof specificity", source: "Goldstein, Cialdini & Griskevicius 2008", tier: "Research", mode: "Auto flags + self-rated",
-    question: "Is the proof specific (a number, a named peer group, a named source) and close to the reader's own situation?",
-    fixes: ["Replace general claims like \"trusted by leading brands\" with a count or named customers.", "Use the peer group closest to the reader: same role, industry or country."] },
-  { id: "fluency", name: "Processing fluency", source: "Alter & Oppenheimer 2009; Song & Schwarz 2008; Flesch 1948", tier: "Research", mode: "Mostly auto",
-    question: "Is the copy easy to read at a glance: short sentences, everyday words?",
-    fixes: ["Split the longest sentence in two.", "Swap long or technical words for the ones your buyer uses."] },
-  { id: "cta", name: "CTA friction", source: "Fogg 2009", tier: "Research", mode: "Auto flags + self-rated",
-    question: "Is there a clear action, and does the copy lower its cost in time, money and effort?",
-    fixes: ["Use a verb that says what happens next, such as \"Book a 20-minute demo\".", "State the cost of the action: time needed, card required or not, commitment."] },
-  { id: "spec", name: "Concrete specificity", source: "Packard & Berger 2021; Schindler & Yalch 2006", tier: "Research applied", mode: "Mostly auto + AI",
-    question: "Are claims tangible: named outcomes, sharp numbers, timeframes, real nouns?",
-    fixes: ["Replace each buzzword with the outcome it stands for.", "Use the measured number, not the rounded one, when you have it."] }
-];
-const LEVEL_NAMES = ["Missing", "Partial", "Present"];
-
-const DEFAULT_BUZZ = ["leverage","synergy","seamless","seamlessly","cutting-edge","innovative","revolutionary","groundbreaking","world-class","best-in-class","next-generation","next-gen","game-changer","game-changing","robust","streamline","empower","holistic","disruptive","unlock","supercharge","elevate","transform","solution","solutions","state-of-the-art","end-to-end","all-in-one","powerful","unparalleled","vibrant","paradigm","frictionless","turnkey","mission-critical","drive growth","take it to the next level","best practices","one-stop shop","unleash"];
-
-const EXAMPLE = "Unlock seamless reporting with our innovative all-in-one platform.\nTrusted by leading brands, our solution helps teams streamline their workflows and drive growth.\nStill exporting campaign data into spreadsheets every Monday? Our customers save 6.5 hours a week.\nLearn more";
-
-/* ---------- Text analysis (pure) ---------- */
-function uniq0(arr) { return [...new Set(arr)]; }
-function splitSentences(text) {
-  return text.split(/(?<=[.!?])\s+|\n+/).map(s => s.trim()).filter(Boolean);
-}
-function wordsOf(text) {
-  return text.match(/[A-Za-zÀ-ÿ]+(?:['’-][A-Za-zÀ-ÿ]+)*/g) || [];
-}
-function syllables(word) {
-  let w = word.toLowerCase().replace(/[^a-z]/g, "");
-  if (!w) return 0;
-  if (w.length <= 3) return 1;
-  w = w.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, "").replace(/^y/, "");
-  const m = w.match(/[aeiouy]{1,2}/g);
-  return m ? m.length : 1;
-}
-function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
-function findAll(text, re, cls) {
-  const out = []; let m; re.lastIndex = 0;
-  while ((m = re.exec(text)) !== null) {
-    if (m[0].length === 0) { re.lastIndex++; continue; }
-    out.push({ start: m.index, end: m.index + m[0].length, text: m[0], cls });
-  }
-  return out;
-}
-
-const RE = {
-  proofCue: /\b(trusted by|used by|loved by|chosen by|relied on by|joined by|join(?:ed)?\s+\d|rated|reviews?|testimonials?|case stud(?:y|ies)|G2|Capterra|Trustpilot|our (?:customers|clients|users)|(?:happy|satisfied) (?:customers|clients|users)|customers love)\b|★/i,
-  countGroup: /\b\d[\d,.]*\+?\s+(?:[A-Za-z-]+\s+){0,3}(?:customers|clients|companies|brands|agencies|teams|businesses|firms|organi[sz]ations|users|marketers|founders|people|members|retailers|stores|shops|schools|clinics|hospitals)\b/i,
-  vagueProof: /\b(trusted by (?:leading|top|the best|many|thousands of|millions of)[\w\s-]*?(?=[,.!?]|$)|leading (?:brands|companies|teams)|industry leaders|thousands of|millions of|countless|(?:many|lots of|plenty of) (?:happy |satisfied )?(?:customers|clients|users|companies|teams|brands)|(?:happy|satisfied) (?:customers|clients)(?! of)|customers love)\b/gi,
-  numbers: /(?<![\w.])\d+(?:[.,]\d+)*\s?(?:%|x\b|k\b|m\b)?/gi,
-  timeframes: /\b(?:\d+(?:[.,]\d+)?\s*[- ]?\s*(?:seconds?|secs?|minutes?|mins?|hours?|hrs?|days?|weeks?|months?|years?)|per (?:day|week|month|year)|every (?:day|week|month|monday|tuesday|wednesday|thursday|friday)|a (?:day|week|month|year))\b/gi,
-  ctaStart: /^(?:start|get|book|try|request|download|sign up|join|buy|shop|claim|schedule|see|learn more|contact|submit|discover|explore|find out|read more|click here|talk to|order|subscribe|reserve|apply|register|watch|compare|save your|open|grab|check|calculate|create|build|upgrade|activate|chat|call|ask|reply|redeem|enrol|enroll|rsvp|secure your|pick|choose your|plan your|get started)\b/i,
-  enStop: /\b(?:the|and|to|of|a|an|in|for|you|your|our|we|with|is|are|on|it|this|that|from|at|by|be|or|can|will|get|more)\b/gi,
-  vagueCta: /\b(?:learn more|submit|click here|discover more|discover|explore|find out more|read more|contact us)\b/gi,
-  frictionReducer: /\b(?:free|no credit card|no card needed|no card required|cancel anytime|no commitment|no setup|no installation|instant(?:ly)?|risk[- ]free|money[- ]back|guarantee[d]?|in \d+ (?:minutes?|seconds?|days?)|takes (?:only |just |under )?\d+ (?:seconds?|minutes?)|\d+[- ](?:second|minute)s?)\b/i,
-  loss: /\b(?:lose|losing|lost|loss|miss(?:ing|ed)?|waste[ds]?|wasting|costs? you|cost of|leaving [\w\s]* on the table|falling behind|left behind|don'?t let|stop (?:paying|losing|wasting)|before it'?s too late|risk(?:ing)?)\b/gi,
-  sq: /\b(?:still (?:using|exporting|paying|doing|stuck)|stuck with|switch(?:ing)?|migrat(?:e|ion|ing)|import your|keep your|no setup|cancel anytime|risk[- ]free|money[- ]back|free trial|spreadsheets?|manual(?:ly)?|current (?:tool|provider|setup|agency))\b/gi,
-  listItem: /^\s*(?:[-•*]|\d+[.)])\s+/
+var CASES={
+ air:{
+  note:'<b>Example case.</b> The platform launches an AI Receptionist add-on. It answers salon calls, books, reschedules and cancels in the platform calendar and confirms by text. The goal of these tests is the strongest message for partners who have not tried it yet. <span class="guard">Product details are illustrative.</span>',
+  goal:"AI Receptionist adoption", metric:"Subscriptions within 30 days",
+  segs:[{id:"na",label:"Not aware",def:"Never opened or clicked an AI Receptionist message, but opened at least one of our emails in the last 90 days, so email can reach them"},{id:"ac",label:"Aware, not convinced",def:"Opened or clicked a launch message, or visited the page, but did not subscribe"}], pool:"Non-adopters per market", markets:{UK:{na:9000,ac:3000},DE:{na:6000,ac:2000}}, holdout:10,
+  rounds:[
+   {q:"What do partners value most: help while they are working, or being reachable day and night?",ta:["Recognition","Relief"],tb:["Peace of mind","Security"],pa:"Mental simulation",pb:"Certainty effect",la:"With a client",lb:"Day and night",s:"na",v:"Value premise",p:"Mental simulation vs certainty",h:"Partners who don't know AI Receptionist yet react faster to a moment they live every day than to a product promise. If so, the subject showing a call they can't take while with a client (cell A) will get more partners to subscribe within 30 days than the one promising cover day and night (cell B).",a:"Answer every call, even when you're with a client",b:"Your salon phone, answered day and night",m:"Subscriptions within 30 days",base:2.5,mde:60,apply:"Core value message for the AI Receptionist"},
+   {q:"Do partners respond more to what they gain or to what they could lose?",ta:["Optimism","Control"],tb:["Fear of missing out","Urgency"],pa:"Gain framing",pb:"Loss aversion",la:"Gain",lb:"Loss",s:"na",v:"Subject line framing",p:"Gain vs loss",h:"Both cells keep the launch premise and change only the frame. People act more to avoid a loss than to get the same gain. If so, naming the bookings lost to missed calls (cell B) will get more partners to subscribe within 30 days than naming the bookings kept (cell A).",a:"Keep every booking, even when you're with a client",b:"Stop missing bookings when you can't pick up",m:"Subscriptions within 30 days",base:2.5,mde:60,apply:"Framing for AI Receptionist subject lines",res:{nA:3300,xA:79,nB:3300,xB:122}},
+   {q:"What gets them to open: a clear next step, or how it works?",ta:["Confidence","Ease"],tb:["Trust","Curiosity"],pa:"Clear next step",pb:"Proof through specifics",la:"Next step",lb:"How it works",s:"na",v:"Preview text",p:"Next step vs how it works",h:"The subject already names the problem, so the preview should add something new. A concrete next step makes acting feel easier than a list of features. If so, the sample call preview (cell A) will get more partners to subscribe within 30 days than the how-it-works preview (cell B).",a:"Listen to a sample call it answered",b:"It books, reschedules and cancels straight into your calendar",m:"Subscriptions within 30 days",base:2.5,mde:60,apply:"Preview text pattern for launch emails"},
+   {q:"Where do they pay attention: email, or inside the app?",ta:["Clarity"],tb:["Familiarity", "Trust"],pa:"Single touch",pb:"Mere exposure: seen again where they work",la:"Email only",lb:"Email + in-app",s:"na",v:"Channel",p:"Repetition in context",h:"Partners spend their working day in the salon app, not in their inbox. Seeing the offer again where they work makes it familiar and easier to act on. If so, email plus a What's New card (cell B) will get more partners to subscribe within 30 days than email only (cell A).",a:"Email only",b:"Email plus in-app What's New card",m:"Subscriptions within 30 days",base:2.5,mde:60,apply:"Channel mix for Tier 1 launches"},
+   {q:"Which value moves them to act: time or money?",ta:["Relief", "Calm"],tb:["Frustration", "Urgency"],pa:"Present bias: relief from admin today",pb:"Loss aversion: lost bookings",la:"Time saved",lb:"Money",s:"ac",v:"Body angle",p:"Time saved vs money",h:"Calls interrupt a partner's day every day, while lost revenue is harder to see. If so, the time angle (cell A) will get more partners to subscribe within 30 days than the money angle (cell B).",a:"Time: calls interrupt your working day. The AI Receptionist takes them so you can stay with your client.",b:"Money: every unanswered call can be a lost booking. The AI Receptionist answers day and night and books straight into your calendar.",m:"Subscriptions within 30 days",base:2.5,mde:60,apply:"Angle for the launch follow-up and Account Manager talk track"},
+   {q:"Do they trust other salon owners more than product facts?",ta:["Clarity","Trust"],tb:["Belonging","Reassurance"],pa:"Product facts",pb:"Social proof",la:"Facts",lb:"Peer proof",s:"ac",v:"Social proof",p:"Product facts vs a salon owner's words",h:"Partners who know the product but haven't subscribed doubt it works for a salon like theirs. Another salon owner's words answer that doubt better than product facts. If so, the partner quote (cell B) will get more partners to subscribe within 30 days than product facts alone (cell A).",a:"It answers, books and confirms by text, so your team can stay with clients.",b:"A short quote from a salon owner already using it (use an approved partner quote).",m:"Subscriptions within 30 days",base:2.5,mde:60,apply:"Proof block in launch and follow-up emails"},
+   {q:"Do they want to try first, or decide directly?",ta:["Control", "Ambition"],tb:["Curiosity", "Ease"],pa:"Direct commitment",pb:"Foot in the door: a small first step",la:"Commit now",lb:"Try first",s:"ac",v:"Call to action",p:"Small first step (foot in the door)",h:"Paying for a new tool feels like a big step for partners who are still unsure. A small first step, hearing it answer, lowers that barrier. If so, 'Listen to a sample call' (cell B) will get more partners to subscribe within 30 days than 'Start your subscription' (cell A).",a:"Start your subscription",b:"Listen to a sample call",m:"Subscriptions within 30 days",base:2.5,mde:60,apply:"CTA for paid add-ons"},
+   {q:"How long do they need before they act?",ta:["Calm", "Autonomy"],tb:["Curiosity", "Momentum"],pa:"Spacing: time to consider",pb:"Recency: interest still fresh",la:"Day 7",lb:"Day 3",s:"ac",v:"Follow-up timing",p:"Recency vs fatigue",h:"Interest fades quickly after the first email. If so, a reminder on day 3 (cell B) will get more partners to subscribe within 30 days than one on day 7 (cell A), without raising unsubscribes.",a:"Reminder on day 7",b:"Reminder on day 3",m:"Subscriptions, unsubscribes as guardrail",base:2.5,mde:60,apply:"Reminder cadence in launch sequences"}
+  ]},
+ dac7:{
+  note:'<b>Example case.</b> Under the EU DAC7 and UK DRR rules, platforms must collect their partners\' business and tax details. Partners who miss the deadline may have payments affected and access paused. We only ask through official email or inside the account. Legal wording stays fixed: these tests only change framing, order and timing, with Legal sign-off. <span class="guard">The deadline of 14 December is illustrative.</span>',
+  goal:"DAC7 completion before 14 December", metric:"Details completed by the deadline",
+  segs:[{id:"all",label:"Details incomplete",def:"Receives payouts and has not completed the tax details yet"}], pool:"Partners still incomplete per market", markets:{UK:{all:5200},NL:{all:3900},ES:{all:4300},IT:{all:4800},FR:{all:3600},DE:{all:3100},BE:{all:1500}}, holdout:0,
+  rounds:[
+   {q:"What gets partners to act on a required task: the consequence or the deadline?",ta:["Concern", "Urgency"],tb:["Clarity", "Urgency"],pa:"Loss aversion: payouts at risk",pb:"Deadline effect: a clear date",la:"Consequence first",lb:"Deadline first",s:"all",v:"Subject line framing",p:"Deadline vs consequence",h:"A clear deadline gets more completions than leading with the risk, which can read like a scam.",a:"Action needed by 14 Dec: keep payouts running",b:"Complete your tax details by 14 December",m:"Completion within 7 days",base:18,mde:15,apply:"Subject lines for all compliance sends"},
+   {q:"Does a named payments team feel more trustworthy than the brand alone?",ta:["Trust"],tb:["Trust", "Security"],pa:"Familiarity: the known brand",pb:"Authority: a named payments team",la:"Brand",lb:"Payments team",s:"all",v:"Sender name",p:"Authority and trust",h:"A named finance or compliance sender lowers scam fears and lifts completion.",a:"[Brand name]",b:"[Brand name] Partner Payments",m:"Completion within 7 days",base:18,mde:15,apply:"Sender for payment and compliance messages"},
+   {q:"Do partners need reassurance before they share their details?",ta:["Clarity"],tb:["Security", "Trust"],pa:"Direct ask",pb:"Trust signalling: reassurance before the ask",la:"Ask first",lb:"Trust first",s:"all",v:"Order of the message",p:"Trust before the ask",h:"Opening with the security line (how we will and won't ask) before the request raises completion.",a:"Request first, security line at the end",b:"Security line first, then the request",m:"Completion within 7 days",base:18,mde:15,apply:"Template order for anything asking for data"},
+   {q:"Does knowing how long it takes lower the barrier to start?",ta:["Neutral"],tb:["Ease", "Relief"],pa:"No effort cue",pb:"Effort reduction: a time estimate",la:"No time stated",lb:"Time stated",s:"all",v:"Effort framing",p:"Reduce perceived effort",h:"Stating how long the form takes lowers friction. Only use a time that is true.",a:"Complete your details",b:"Complete your details (about 5 minutes, check before sending)",m:"Completion within 7 days",base:18,mde:15,apply:"CTA wording for admin tasks"},
+   {q:"Do partners drop off because they are not prepared?",ta:["Neutral"],tb:["Confidence", "Control"],pa:"No preparation cue",pb:"Implementation intention: prepare first",la:"No checklist",lb:"Checklist",s:"all",v:"Checklist in the email",p:"Preparation lowers drop-off",h:"Listing the documents to have ready (VAT number, registration number, bank account) means fewer partners start and give up.",a:"No checklist",b:"Short checklist of what to have ready",m:"Started vs completed",base:60,mde:8,apply:"Admin request template"},
+   {q:"When do partners deal with admin?",ta:["Focus"],tb:["Motivation"],pa:"Attention: end of the week",pb:"Fresh start effect: the start of the week",la:"Thursday",lb:"Monday",s:"all",v:"Send time",p:"Available attention",h:"A Monday send gets more completions in the first week than a Thursday send.",a:"Thursday 10:00",b:"Monday 09:00",m:"Completion within 7 days",base:18,mde:15,apply:"Send slot for required actions"},
+   {q:"Do partners who ignore email act on a notice inside their account?",ta:["Clarity"],tb:["Familiarity", "Trust"],pa:"Single touch",pb:"Mere exposure: seen again in the account",la:"Email only",lb:"Email + in-app",s:"all",v:"Channel",p:"Repetition in context",h:"An in-app banner next to email reaches partners who ignore email.",a:"Email only",b:"Email plus in-app notice",m:"Completion by the deadline",base:55,mde:8,apply:"Channel mix for all required actions"},
+   {q:"How many reminders do partners need before they act?",ta:["Calm", "Respect"],tb:["Restlessness", "Relief"],pa:"Avoid fatigue",pb:"Zeigarnik effect: an unfinished task stays on the mind",la:"Two reminders",lb:"Four reminders",s:"all",v:"Reminder cadence",p:"Recency vs fatigue",h:"Four reminders to incomplete partners beat two, with no rise in complaints.",a:"Two reminders",b:"Four reminders",m:"Completion by the deadline, complaints as guardrail",base:55,mde:8,apply:"Cadence for deadline-driven sends"}
+  ]},
+ menu:{"note": "<b>Example case.</b> Only 45% of new partners add their full service menu within 30 days, and partners who complete the menu and invite their team are 2x as likely to be active at month 6. The eight rounds show what Flight 1 would learn about getting more menus completed. Partner counts, baselines and results are fictional, to show how the method reads real data.", "goal": "Full service menu", "metric": "Menus completed within 7 days of the send", "segs": [{"id": "st", "label": "Menu started", "def": "Added at least one service, menu not complete yet"}, {"id": "em", "label": "Menu empty", "def": "Account created, no services added yet"}], "pool": "New partners over six months per market", "markets": {"UK": {"st": 5400, "em": 3600}, "NL": {"st": 3000, "em": 2100}, "ES": {"st": 3600, "em": 2400}, "IT": {"st": 3300, "em": 2400}, "DE": {"st": 2700, "em": 1800}}, "holdout": 10, "rounds": [{"q": "What do new partners value most: their clients, or their own services?", "ta": ["Care", "Responsibility"], "tb": ["Pride", "Recognition"], "pa": "Perspective taking: the client's view", "pb": "Self-reference: their own work", "la": "Their clients", "lb": "Their services", "s": "st", "v": "Subject line focus", "p": "Their clients vs their services", "h": "This is the day 3 email of the onboarding journey. The body stays the same, so the subject line is the only difference. If partners think like business owners, the client view (cell A) will get more menus completed within 7 days. If they think like craftspeople, their own work (cell B) will. The winning focus leads the next emails.", "a": "Can clients see everything you offer?", "b": "Is everything you do on your menu?", "m": "Menus completed within 7 days", "base": 20, "mde": 10, "apply": "Focus for every menu email that follows", "res": {"nA": 6700, "xA": 1467, "nB": 6700, "xB": 1367}, "resNote": "pooled over about five months of sign-ups"}, {"q": "Do they move more to avoid a loss, or to build on what they've started?", "ta": ["Concern", "Urgency"], "tb": ["Pride", "Momentum"], "pa": "Loss aversion", "pb": "Endowed progress effect", "la": "Loss", "lb": "Progress", "s": "st", "v": "Subject line frame", "p": "Loss vs progress", "h": "Both subjects keep the clients focus, so only the frame changes. People act more to avoid a loss than to get the same gain. If so, the loss frame (cell A) will get more menus completed within 7 days than the progress frame (cell B).", "a": "Can clients see everything you offer?", "b": "Clients can already book your first treatments. What's next?", "m": "Menus completed within 7 days", "base": 20, "mde": 10, "apply": "Frame for setup subject lines", "res": {"nA": 6650, "xA": 1370, "nB": 6650, "xB": 1337}, "resNote": "pooled over the next five months"}, {"q": "Does a nudge to continue now beat permission to take their time?", "ta": ["Momentum", "Ease"], "tb": ["Calm", "Autonomy"], "pa": "Open loop: pick up where they left off", "pb": "Autonomy: their own pace", "la": "Continue now", "lb": "Own pace", "s": "st", "v": "Preview text", "p": "Continue now vs own pace", "h": "The preview should move them to act, not give them a reason to wait. If so, 'Pick up where you left off' (cell A) will get more menus completed within 7 days than 'Your menu, at your own pace' (cell B).", "a": "Pick up where you left off", "b": "Your menu, at your own pace", "m": "Menus completed within 7 days", "base": 20, "mde": 10, "apply": "Preview text for setup reminders", "res": {"nA": 2900, "xA": 596, "nB": 2900, "xB": 574}, "resNote": "first two months", "st": "running"}, {"q": "Do they need empathy first, or the reason first?", "ta": ["Relief", "Ease"], "tb": ["Clarity", "Purpose"], "pa": "Empathy first: lowering the pressure", "pb": "Reason why: what clients see", "la": "Empathy first", "lb": "Reason first", "s": "st", "v": "Body opener", "p": "Empathy vs reason first", "h": "Busy owners push back on pressure. Lifting it first makes the ask feel smaller. If so, the empathy opener (cell A) will get more menus completed within 7 days than the reason-first opener (cell B).", "a": "Your menu doesn't have to be done in one sitting. Add a few now and come back for the rest.", "b": "Clients choose from what they can see. If a treatment isn't on your menu, they can't book it.", "m": "Menus completed within 7 days", "base": 20, "mde": 10, "apply": "Opening line for setup emails"}, {"q": "Does a smaller, named step get more of them moving?", "ta": ["Control"], "tb": ["Ease", "Confidence"], "pa": "Open ask", "pb": "Tiny Habits: a small, named step", "la": "Open ask", "lb": "Small step", "s": "st", "v": "Call to action", "p": "Open ask vs small named step", "h": "An open-ended task feels bigger than it is. Naming a small, finite step lowers the barrier. If so, 'Add three services now' (cell B) will get more menus completed within 7 days than 'Add my services' (cell A).", "a": "Add my services", "b": "Add three services now", "m": "Menus completed within 7 days", "base": 20, "mde": 10, "apply": "CTA for setup tasks"}, {"q": "Do they learn better from reading the steps, or from seeing them done?", "ta": ["Clarity", "Control"], "tb": ["Confidence", "Ease"], "pa": "Written steps", "pb": "Demonstration: seeing it done", "la": "Written", "lb": "Video", "s": "em", "v": "How-to format", "p": "Written steps vs video", "h": "Partners who haven't started are unsure how. Watching the exact clicks lowers that barrier more than reading them. If so, the short video (cell B) will get more partners to add their first services within 7 days than written steps (cell A).", "a": "Three written steps, with a deep link to the setting", "b": "A short video showing the same steps, with the same deep link", "m": "First services added within 7 days", "base": 15, "mde": 10, "apply": "Format for setup help in email and the help centre", "res": {"nA": 9400, "xA": 1391, "nB": 9400, "xB": 1560}, "resNote": "pooled over about ten months of sign-ups"}, {"q": "Does a named person make the call offer feel more real?", "ta": ["Trust"], "tb": ["Belonging", "Reassurance"], "pa": "Familiarity: the known brand", "pb": "Liking: a named person", "la": "Brand", "lb": "Named person", "s": "em", "v": "Sender name", "p": "Brand vs a named Account Manager", "h": "An offer of help feels more personal when it comes from someone with a name. If so, the Account Manager's name as sender (cell B) will get more partners to add their first services within 7 days than the brand name (cell A), with more setup guidance calls booked.", "a": "[Brand name]", "b": "[Account Manager name] at [Brand name]", "m": "First services added within 7 days", "base": 15, "mde": 10, "apply": "Sender for help and call offers", "res": {"nA": 3100, "xA": 468, "nB": 3100, "xB": 490}, "resNote": "first three months", "st": "running"}, {"q": "Which question gets more of them to tell us what they need?", "ta": ["Care", "Trust"], "tb": ["Ease", "Autonomy"], "pa": "Offer of help", "pb": "Ability: what would make it easier", "la": "Offer help", "lb": "Make it easier", "s": "em", "v": "Check-in question", "p": "Offer of help vs what would make it easier", "h": "A question about what would make setup easier invites a concrete answer, so we learn the barrier and route help faster. If so, cell B will get more partners to add their first services within 7 days than the general offer of help (cell A), with more one-click answers.", "a": "How can we help you get set up?", "b": "What would make setup easier for you?", "m": "First services added within 7 days", "base": 15, "mde": 10, "apply": "Check-in question for stalled setups"}]},
+ sms:{
+  note:'<b>Example feature.</b> The platform adds automatic rebook reminders by email and SMS. SMS needs credit top-ups and desktop setup is recommended. Every rebook fills a slot in their calendar. <span class="guard">Feature details are illustrative.</span>',
+  goal:"SMS rebook reminders switched on", metric:"Partners with SMS reminders on after 30 days",
+  segs:[{id:"all",label:"SMS reminders off",def:"Email rebook reminders on, SMS rebook reminders off"}], pool:"Partners with SMS off per market", markets:{UK:{all:2400},BE:{all:500},NL:{all:1800},ES:{all:1700},IT:{all:1900}}, holdout:10,
+  rounds:[
+   {q:"Do partners respond more to a question about their own problem, or to a statement?",ta:["Optimism"],tb:["Curiosity", "Recognition"],pa:"Benefit framing",pb:"Curiosity and self-reference: a question",la:"Statement",lb:"Question",s:"all",v:"Subject line hook",p:"Question vs statement",h:"A question about a real pain (clients forgetting to rebook) gets more partners to switch SMS reminders on than a statement of the feature.",a:"Clients rebook faster by text",b:"Are your clients forgetting to rebook?",m:"Switched on within 30 days",base:4,mde:40,apply:"Subject lines for adoption flows"},
+   {q:"Does a team sender feel closer than the brand alone?",ta:["Trust"],tb:["Belonging", "Trust"],pa:"Familiarity: the known brand",pb:"Social presence: a team behind it",la:"Brand",lb:"Team",s:"all",v:"Sender name",p:"Trust and familiarity",h:"A team sender gets more partners to switch SMS reminders on than the brand name alone.",a:"[Brand name]",b:"[Brand name] Partner Team",m:"Switched on within 30 days",base:4,mde:40,apply:"Default sender for adoption flows"},
+   {q:"What gets them to open: how it works, or the next step?",ta:["Optimism"],tb:["Confidence", "Ease"],pa:"How it works",pb:"Clear next step (implementation intention)",la:"How it works",lb:"Next step",s:"all",v:"Preview text",p:"How it works vs next step",h:"Preview text should add to the subject line, not repeat it. Naming the setup step gets more partners to switch SMS reminders on than describing how it works.",a:"Clients get a text when it is time to book again",b:"Switch it on in the app, then top up your SMS credits",m:"Switched on within 30 days",base:4,mde:40,apply:"Preview text for how-to emails"},
+   {q:"Which value moves them: client convenience or a fuller calendar?",ta:["Relief", "Care"],tb:["Pride", "Smart choice"],pa:"Ease: convenience for clients",pb:"Value salience: a fuller calendar",la:"Convenience",lb:"Fuller calendar",s:"all",v:"Body angle",p:"Fuller calendar vs client convenience",h:"Reminding partners that rebooked clients fill their calendar beats a client convenience angle.",a:"Convenience: your clients get a text when it is time to book again, and rebook in a tap.",b:"Fuller calendar: a text reminder brings clients back sooner, so fewer slots stay empty.",m:"Switched on within 30 days",base:4,mde:40,apply:"Value angle in all lifecycle messages"},
+   {q:"Do they want to see the steps before committing?",ta:["Control"],tb:["Ease", "Confidence"],pa:"Direct ask",pb:"Effort reduction: see the steps first",la:"Switch on",lb:"Show steps",s:"all",v:"Call to action",p:"Small first step",h:"A step-by-step setup link beats a generic button.",a:"Switch on SMS reminders",b:"Show me the 3 setup steps",m:"Click to switched on",base:7,mde:30,apply:"CTA for features that need setup"},
+   {q:"Does a device hint prevent failed setups?",ta:["Neutral"],tb:["Ease", "Confidence"],pa:"No cue",pb:"Friction removal: the right device",la:"No hint",lb:"Desktop hint",s:"all",v:"Device hint",p:"Remove friction",h:"Telling partners that setup works best on desktop prevents failed attempts on the phone.",a:"No device hint",b:"Best set up on your computer",m:"Started vs switched on",base:45,mde:15,apply:"Any feature with desktop setup"},
+   {q:"Where do they pay attention: email, or inside the app?",ta:["Clarity"],tb:["Familiarity", "Trust"],pa:"Single touch",pb:"Mere exposure: seen again where they work",la:"Email only",lb:"Email + in-app",s:"all",v:"Channel",p:"Repetition in context",h:"A What's New card in the app lifts adoption next to email.",a:"Email only",b:"Email plus in-app What's New card",m:"Switched on within 30 days",base:4,mde:40,apply:"Channel mix for lifecycle flows"},
+   {q:"How long do they need before they act?",ta:["Calm", "Autonomy"],tb:["Curiosity", "Momentum"],pa:"Spacing: time to consider",pb:"Recency: interest still fresh",la:"Day 10",lb:"Day 3",s:"all",v:"Follow-up timing",p:"Recency vs fatigue",h:"A reminder after 3 days beats one after 10 days, without more unsubscribes.",a:"Reminder on day 10",b:"Reminder on day 3",m:"Switched on, unsubscribes as guardrail",base:4,mde:40,apply:"Reminder cadence in lifecycle flows"}
+  ]}
 };
 
-function analyze(text, buzzTerms) {
-  const t = text || "";
-  const sentences = splitSentences(t);
-  const words = wordsOf(t);
-  const W = words.length, S = Math.max(sentences.length, 1);
-  const syl = words.reduce((a, w) => a + syllables(w), 0);
-  const flesch = W >= 5 ? 206.835 - 1.015 * (W / S) - 84.6 * (syl / Math.max(W, 1)) : null;
-  const avgSentence = W ? W / S : 0;
-  const longest = sentences.reduce((a, s) => Math.max(a, wordsOf(s).length), 0);
+var KEY="crmlab-v1";
+var state;
+function fresh(){var s={current:"menu",cases:{}};Object.keys(CASES).forEach(function(k){s.cases[k]=JSON.parse(JSON.stringify({holdout:CASES[k].holdout,markets:CASES[k].markets,rounds:CASES[k].rounds.map(function(r){return {a:r.a,b:r.b,base:r.base,mde:r.mde,status:r.st||(r.res?"done":"planned"),res:r.res||{nA:"",xA:"",nB:"",xB:""}};})}));});s.cases.menu.v=4;return s;}
+function load(){try{var s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.cases&&s.cases.air){var f=fresh();Object.keys(CASES).forEach(function(k){if(!s.cases[k])s.cases[k]=f.cases[k];});if(s.cases.menu.v!==4)s.cases.menu=f.cases.menu;if(!CASES[s.current])s.current="air";return s;}}catch(e){}return null;}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+state=load()||fresh();state.current="menu";
+var $=function(id){return document.getElementById(id);};
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function fmt(n){return Math.round(n).toLocaleString("en-GB");}
 
-  const buzzHits = [];
-  for (const term of buzzTerms) {
-    const re = new RegExp("(?<![\\w-])" + escapeRe(term).replace(/\\-|-/g, "[- ]?") + "(?![\\w-])", "gi");
-    buzzHits.push(...findAll(t, re, "buzz"));
-  }
-  const vagueProof = findAll(t, new RegExp(RE.vagueProof.source, "gi"), "vague");
-  const proofSentences = sentences.filter(s => RE.proofCue.test(s) || RE.countGroup.test(s));
-  const specificProof = proofSentences.filter(s => RE.countGroup.test(s) || (RE.proofCue.test(s) && /\d/.test(s)) || /\b(G2|Capterra|Trustpilot)\b/.test(s));
+/* Statistics */
+function nPerArm(base,mde){var p1=base/100,p2=p1*(1+mde/100);if(p2>=1||p1<=0)return Infinity;var pb=(p1+p2)/2;var a=1.959964*Math.sqrt(2*pb*(1-pb)),b=0.841621*Math.sqrt(p1*(1-p1)+p2*(1-p2));return Math.ceil(Math.pow(a+b,2)/Math.pow(p2-p1,2)/100)*100;}
+function erf(x){var t=1/(1+0.3275911*Math.abs(x));var y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return x>=0?y:-y;}
+function ztest(nA,xA,nB,xB){if(!(nA>0&&nB>0)||xA<0||xB<0||xA>nA||xB>nB)return null;var pA=xA/nA,pB=xB/nB,p=(xA+xB)/(nA+nB);var se=Math.sqrt(p*(1-p)*(1/nA+1/nB));if(!se)return null;var z=(pB-pA)/se;var pv=2*(1-0.5*(1+erf(Math.abs(z)/Math.SQRT2)));return {pA:pA,pB:pB,lift:pA?((pB-pA)/pA)*100:0,z:z,p:pv};}
 
-  const nums = findAll(t, new RegExp(RE.numbers.source, "gi"), "num").map(n => n.text.trim());
-  let sharp = 0, round = 0;
-  for (const n of nums) {
-    const v = parseFloat(n.replace(/,/g, ""));
-    if (isNaN(v)) continue;
-    if (Number.isInteger(v) && v >= 10 && v % 5 === 0) round++; else sharp++;
-  }
-  const timeframes = findAll(t, new RegExp(RE.timeframes.source, "gi"), "tf");
+function avail(c,sg){var st=state.cases[c],tot=0;Object.keys(st.markets).forEach(function(m){var o=st.markets[m];Object.keys(o).forEach(function(k){if(!sg||k===sg)tot+=(+o[k]||0);});});var inTest=tot*(1-st.holdout/100);return {tot:tot,perArm:Math.floor(inTest/2)};}
 
-  const lines = t.split(/\n+/).map(l => l.trim()).filter(Boolean);
-  const units = uniq0([...lines, ...sentences].map(u => u.replace(/^[^A-Za-zÀ-ÿ]+/, "").trim()).filter(Boolean));
-  const ctaLines = units.filter(l => RE.ctaStart.test(l) && wordsOf(l).length <= 10);
-  const vagueCtaHits = [];
-  for (const l of ctaLines) {
-    const idx = t.indexOf(l);
-    findAll(l, new RegExp(RE.vagueCta.source, "gi"), "cta").forEach(h => vagueCtaHits.push({ ...h, start: h.start + idx, end: h.end + idx }));
-  }
-  const vagueCtaLines = ctaLines.filter(l => new RegExp(RE.vagueCta.source, "i").test(l));
-  const specificCtas = ctaLines.length - vagueCtaLines.length;
-  const hasReducer = RE.frictionReducer.test(t);
-  const lossHits = findAll(t, new RegExp(RE.loss.source, "gi"), "signal");
-  const sqHits = findAll(t, new RegExp(RE.sq.source, "gi"), "signal");
-  const listItems = lines.filter(l => RE.listItem.test(l)).length;
-
-  const sug = {};
-  sug.fluency = flesch === null ? null : flesch >= 60 ? 2 : flesch >= 30 ? 1 : 0;
-  // Named entities: capitalised words that do not start a sentence, in sentences that are not written in Title Case.
-  let named = 0;
-  for (const sen of sentences) {
-    const ws = wordsOf(sen);
-    const caps = ws.filter(w => /^[A-ZÀ-Þ]/.test(w)).length;
-    if (ws.length < 3 || caps / ws.length > 0.4) continue;
-    named += ws.slice(1).filter(w => /^[A-ZÀ-Þ][a-zà-ÿ]/.test(w) && w !== "I" && !buzzTerms.some(b => b.toLowerCase() === w.toLowerCase())).length;
-  }
-  const concrete = sharp + round + timeframes.length + named;
-  const stopHits = (t.match(RE.enStop) || []).length;
-  const nonEnglish = W >= 8 && stopHits / W < 0.05;
-  sug.spec = W < 3 ? null : concrete === 0 ? 0 : buzzHits.length === 0 ? 2 : 1;
-  sug.proof = W < 3 ? null : specificProof.length > 0 && vagueProof.length === 0 ? 2 : proofSentences.length > 0 ? 1 : 0;
-  sug.cta = W < 3 ? null : specificCtas === 0 ? 0 : hasReducer ? 2 : 1;
-  sug.loss = null; sug.sq = null;
-  if (nonEnglish) { sug.fluency = null; sug.spec = null; sug.proof = null; sug.cta = null; }
-
-  return { W, S: sentences.length, flesch, avgSentence, longest, buzzHits, vagueProof, proofSentences, specificProof,
-    sharp, round, timeframes: timeframes.length, ctaLines, vagueCtaLines, vagueCtaHits, specificCtas, hasReducer,
-    lossHits, sqHits, listItems, named, nonEnglish, sug };
+function sendName(c,i,cell){var code={air:'AIR',dac7:'DAC7',sms:'SMS',menu:'MENU'}[c];var v=CASES[c].rounds[i].v.replace(/[^A-Za-z0-9 ]/g,'').split(' ').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join('');return 'TW_'+code+'_R'+(i+1)+cell+'_'+v;}
+function psych(p,t){return '<div class="psy"><span class="plab">Psychology</span><span class="pval">'+esc(p.split(':')[0])+'</span><span class="plab">Emotional triggers</span><span class="chips">'+(t||[]).map(function(x){return '<span class="chip">'+esc(x)+'</span>';}).join('')+'</span></div>';}
+function segLabel(c,id){var f=CASES[c].segs.filter(function(x){return x.id===id;})[0];return f?f.label:id;}
+function verdict(c,i){
+ var R=CASES[c].rounds[i],r=state.cases[c].rounds[i],need=nPerArm(r.base,r.mde),res=r.res,t=ztest(+res.nA,+res.xA,+res.nB,+res.xB);
+ if(!t)return {cls:"",html:"Enter the results to get a verdict.",short:"Not run yet",win:null};
+ var reached=(+res.nA>=need&&+res.nB>=need);
+ var lead=t.pB>=t.pA?'B':'A',ll=lead==='B'?(t.pA?(t.pB-t.pA)/t.pA*100:0):(t.pB?(t.pA-t.pB)/t.pB*100:0);var line='Cell A'+' '+(t.pA*100).toFixed(1)+'% · '+'Cell B'+' '+(t.pB*100).toFixed(1)+'% · +'+ll.toFixed(0)+'% lift for cell '+lead+' · '+(t.p<0.001?'p &lt; 0.001':'p = '+t.p.toFixed(3));
+ var nb=R.pb.split(':')[0],na=R.pa.split(':')[0];
+ if(!reached&&t.p<0.001){var wc=t.lift>0?'B':'A',wn=t.lift>0?nb:na;return {cls:"win",html:'<b>Partners respond more to cell '+wc+' ('+esc(wn)+'). Clear result before the full sample.</b> '+line+'. The difference is strong enough to stop early (p &lt; 0.001). Log the learning.',short:"Cell "+wc+": "+wn+" (early)",win:wc};}
+ if(!reached)return {cls:"flat",html:'<b>Keep running.</b> '+line+'. Sample not reached yet ('+fmt(need)+' per cell needed).',short:"Running, sample not reached",win:null};
+ if(t.p<0.05&&t.lift>0)return {cls:"win",html:'<b>Partners respond more to cell B ('+esc(nb)+').</b> '+line+'. Log the learning.',short:"Cell B: "+nb+" (+"+t.lift.toFixed(0)+"%)",win:"B"};
+ if(t.p<0.05&&t.lift<0)return {cls:"win",html:'<b>Partners respond more to cell A ('+esc(na)+').</b> '+line+'. Log the learning.',short:"Cell A: "+na+" (+"+ll.toFixed(0)+"%)",win:"A"};
+ return {cls:"flat",html:'<b>No clear difference.</b> '+line+'. Partners did not respond differently, so this choice matters less for them.',short:"No clear difference",win:"none"};
 }
 
-const APPLIES = {
-  ad: ["loss", "sq", "proof", "fluency", "cta", "spec"],
-  landing: ["loss", "sq", "proof", "fluency", "cta", "spec"],
-  email: ["loss", "sq", "proof", "fluency", "cta", "spec"],
-  headline: ["loss", "fluency", "spec"]
-};
-function applicable(type) { return APPLIES[type] || APPLIES.ad; }
+function tgt(r){var b=+r.base,t=b*(1+(+r.mde)/100);function f(x){return (Math.round(x*10)/10).toString();}return f(b)+'% \u2192 '+f(t)+'%';}
+function feas(c,i){var r=state.cases[c].rounds[i],need=nPerArm(r.base,r.mde),av=avail(c,CASES[c].rounds[i].s).perArm;
+ if(!isFinite(need))return '<span class="pill crit">Check baseline and lift</span>';
+ if(need<=av)return '<span class="pill ok">'+fmt(need)+' per cell · fits</span>';
+ if(need<=av*2)return '<span class="pill warn">'+fmt(need)+' per cell · pool with the next wave</span>';
+ return '<span class="pill crit">'+fmt(need)+' per cell · too small, aim for a bigger lift</span>';}
 
-/* Returns the weighted score over rated, applicable heuristics, and whether every applicable one is rated (final). */
-function scoreFrom(ratings, weights, type) {
-  const ids = applicable(type || "ad");
-  let num = 0, den = 0, rated = 0;
-  for (const id of ids) {
-    const r = ratings[id];
-    const w = Math.max(0, Number(weights[id]) || 0);
-    if (r === null || r === undefined) continue;
-    rated++; num += (r / 2) * w; den += w;
-  }
-  return { score: den > 0 ? Math.round((num / den) * 100) : 0, rated, total: ids.length, final: rated === ids.length && den > 0 };
-}
+function renderSummary(){var c=state.current,k=CASES[c],av=avail(c),fit=0;state.cases[c].rounds.forEach(function(r,i){if(nPerArm(r.base,r.mde)<=avail(c,k.rounds[i].s).perArm)fit++;});
+ var done=state.cases[c].rounds.filter(function(r){return r.status==="done";}).length;
+ $("summary").innerHTML=
+  '<div class="sum"><span class="k">Test goal</span><span class="t">'+esc(k.goal)+'</span></div>'+
+  '<div class="sum"><span class="k">Decided by</span><span class="t">'+esc(k.metric)+'</span></div>'+
+  '<div class="sum"><span class="k">Partners in pool</span><span class="n">'+fmt(av.tot)+'</span><span class="c">'+esc(k.pool.replace(' per market',''))+'</span></div>'+
+  '<div class="sum"><span class="k">'+(c==="menu"?'Waves needed':'Sends needed')+'</span><span class="n">'+maxWaves(c)+'</span><span class="c">'+(c==="menu"?'Six-month sign-up waves to run all 8 rounds':'At least a week apart, to run all 8 rounds')+'</span></div>'+
+  '<div class="sum"><span class="k">Progress</span><span class="n">'+done+'<small> / 8</small></span><span class="bar"><i style="width:'+(done/8*100)+'%"></i></span><span class="c">Rounds completed</span></div>';}
 
+function renderMarkets(){var c=state.current,k=CASES[c],mk=state.cases[c].markets,keys=Object.keys(mk),sg=k.segs;
+ $("poolTitle").textContent=k.pool;
+ $("segdefs").innerHTML=sg.map(function(x){return '<div><b>'+esc(x.label)+'.</b> '+esc(x.def)+'</div>';}).join("")+(sg.length>1?'<div class="segnote">Groups are set from CRM data before each round and update after every send. Partners who open or click move to Aware, not convinced. Partners who subscribe leave the test. A conversion in the Not aware group means knowing it exists was enough. Partners who have not opened any of our emails in 90 days are left out of email tests: more email will not reach them and hurts deliverability, so they are reached in-app or by an Account Manager.</div>':'');
+ var g=$("markets");g.style.gridTemplateColumns="36px repeat("+sg.length+",minmax(0,1fr))";
+ var h='<span></span>'+sg.map(function(x){return '<span class="hint">'+esc(x.label)+'</span>';}).join("");
+ keys.forEach(function(m){h+='<span class="mono"><b>'+m+'</b></span>'+sg.map(function(x){return '<input type="number" min="0" step="100" id="mk_'+m+'_'+x.id+'" data-mk="'+m+'" data-sg="'+x.id+'" aria-label="'+m+', '+esc(x.label)+'" value="'+(+mk[m][x.id]||0)+'">';}).join("");});
+ g.innerHTML=h;$("holdout").value=state.cases[c].holdout;renderPool();}
+function maxWaves(c){var hold=state.cases[c].holdout,m=1;CASES[c].segs.forEach(function(x){var need=flightNeed(c,x.id),av=Math.floor(avail(c,x.id).tot*(1-hold/100));if(need&&av>0)m=Math.max(m,Math.ceil(need/av));});return m;}
+function flightNeed(c,sg){var t=0,par=(c==="menu"&&sg==="em");CASES[c].rounds.forEach(function(R,i){if(R.s===sg){var n=nPerArm(state.cases[c].rounds[i].base,state.cases[c].rounds[i].mde);if(isFinite(n))t=par?Math.max(t,2*n):t+2*n;}});return t;}
+function renderPool(){var c=state.current,k=CASES[c],hold=state.cases[c].holdout,parts=[];
+ k.segs.forEach(function(x){var need=flightNeed(c,x.id);if(!need)return;var av=Math.floor(avail(c,x.id).tot*(1-hold/100));var waves=av>0?Math.ceil(need/av):Infinity;
+  parts.push(x.label+" group: Flight 1 uses "+fmt(need)+" partners of "+fmt(av)+" available, "+(waves<=1?"so it fits in one wave":isFinite(waves)?"so it runs over "+waves+" waves":"so add partner counts"));});
+ $("poolNote").textContent=parts.join(". ")+". Example counts: replace them with real numbers from the CRM.";}
+function renderMap(){var c=state.current,k=CASES[c],h='<div class="flight"><span class="eyebrow">Flight 1 · Learn</span><p>Eight independent rounds. A partner never sees the same test twice, and nothing is carried over.</p></div>';
+ k.rounds.forEach(function(R,i){var r=state.cases[c].rounds[i],v=verdict(c,i);
+  h+='<article class="round" data-status="'+r.status+'" id="round'+i+'">'+
+   '<div class="rhead"><div class="rtitle"><span class="rnum">'+(i+1)+'</span><div><h3>'+esc(R.v)+'</h3><div class="principle">'+esc(R.p)+'</div></div></div>'+
+   '<select data-i="'+i+'" data-f="status" aria-label="Status of round '+(i+1)+'"><option value="planned">Planned</option><option value="running">Running</option><option value="done">Done</option></select></div>'+
+   '<p class="learn"><b>What we learn.</b> '+esc(R.q)+'</p><p class="hyp"><b>Hypothesis.</b> '+esc(R.h)+'</p>'+
+   '<div class="variants"><div class="var"><span class="tag">ROUND '+(i+1)+' · CELL A'+(R.aw?' <span class="aw">('+esc(R.aw)+')</span>':'')+'</span><textarea data-i="'+i+'" data-f="a" aria-label="Variant A, round '+(i+1)+'" id="a'+i+'">'+esc(r.a)+'</textarea>'+psych(R.pa,R.ta)+'</div>'+
+   '<div class="var b"><span class="tag">ROUND '+(i+1)+' · CELL B</span><textarea data-i="'+i+'" data-f="b" aria-label="Variant B, round '+(i+1)+'" id="b'+i+'">'+esc(r.b)+'</textarea>'+psych(R.pb,R.tb)+'</div></div>'+
+   '<div class="stats"><div class="field"><label for="base'+i+'">Baseline %</label><input type="number" id="base'+i+'" data-i="'+i+'" data-f="base" min="0.1" step="0.1" value="'+r.base+'"></div>'+
+   '<div class="field"><label for="mde'+i+'">Target lift % (relative)</label><input type="number" id="mde'+i+'" data-i="'+i+'" data-f="mde" min="1" step="1" value="'+r.mde+'"></div>'+
+   '<div class="field"><span class="lbl">Sample needed</span><div class="feasbox" id="feas'+i+'">'+feas(c,i)+'</div></div></div>'+
+   
+   '<div class="meta"><span>Tested on: <b>'+esc(segLabel(c,R.s))+' group</b></span><span>Decides on: <b>'+esc(R.m)+'</b></span><span>Supporting signal: <b>'+(/^(Subject|Sender|Preview|Send)/.test(R.v)?'Clicks and open rate':'Clicks, open rate and unsubscribes')+'</b></span></div>'+
+   '<details class="res"'+(r.status!=="planned"?" open":"")+'><summary>Results'+(R.res?' (illustrative example, '+(R.resNote||'pooled over two sends')+')':'')+'</summary><div class="resbox">'+
+   '<div class="row4"><div class="field"><label for="nA'+i+'">Sent, cell A</label><input type="number" min="0" id="nA'+i+'" data-i="'+i+'" data-r="nA" value="'+esc(r.res.nA)+'"></div>'+
+   '<div class="field"><label for="xA'+i+'">Converted, cell A</label><input type="number" min="0" id="xA'+i+'" data-i="'+i+'" data-r="xA" value="'+esc(r.res.xA)+'"></div>'+
+   '<div class="field"><label for="nB'+i+'">Sent, cell B</label><input type="number" min="0" id="nB'+i+'" data-i="'+i+'" data-r="nB" value="'+esc(r.res.nB)+'"></div>'+
+   '<div class="field"><label for="xB'+i+'">Converted, cell B</label><input type="number" min="0" id="xB'+i+'" data-i="'+i+'" data-r="xB" value="'+esc(r.res.xB)+'"></div></div>'+
+   '<div class="verdict '+v.cls+'" id="ver'+i+'">'+v.html+'</div></div></details>'+
+   '</article>';});
+ $("map").innerHTML=h;
+ k.rounds.forEach(function(R,i){$("map").querySelector('select[data-i="'+i+'"]').value=state.cases[c].rounds[i].status;});}
 
-/* ---------- State ---------- */
-const state = {
-  self: {}, ai: {}, analysis: null,
-  weights: Object.fromEntries(HEURISTICS.map(h => [h.id, 1])),
-  ai_mode: null, sample: null, aiResult: null, shownScore: 0
-};
-const $ = id => document.getElementById(id);
-const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function renderLog(){var c=state.current,k=CASES[c],h="";
+ k.rounds.forEach(function(R,i){var v=verdict(c,i),r=state.cases[c].rounds[i];
+  var pill=v.win==="B"?'<span class="pill ok">'+esc(v.short)+'</span>':v.win==="A"?'<span class="pill ok">'+esc(v.short)+'</span>':v.win==="none"?'<span class="pill warn">'+esc(v.short)+'</span>':'<span class="pill mut">'+esc(r.status==="running"?"Running":"Not run yet")+'</span>';
+  h+='<tr><td class="mono">'+(i+1)+'</td><td>'+esc(R.v)+'</td><td>'+pill+'</td><td>'+esc(R.p)+'</td><td>'+((v.win==="A"||v.win==="B")?'<b>'+esc(R.apply)+'</b>':esc(R.apply))+'</td></tr>';});
+ $("log").innerHTML=h;}
 
-function effective(id) {
-  if (state.self[id] !== undefined && state.self[id] !== null) return { v: state.self[id], src: "you" };
-  if (state.analysis && state.analysis.sug[id] !== null && state.analysis.sug[id] !== undefined) return { v: state.analysis.sug[id], src: "auto" };
-  return { v: null, src: null };
-}
-function buzzTerms() { return DEFAULT_BUZZ; }
-function uniq(arr) { return [...new Set(arr)]; }
-function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c])); }
-const pad = i => String(i + 1).padStart(2, "0");
-const copyType = () => $("copyType").value;
-const isApplicable = id => applicable(copyType()).includes(id);
-const TYPE_PLURAL = { ad: "ad copy", landing: "landing pages", email: "emails", headline: "headlines" };
+function renderAll(){var c=state.current;
+ document.querySelectorAll(".seg button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.case===c));});
+ renderSummary();renderMarkets();renderMap();renderLog();}
 
-/* ---------- Rendering ---------- */
-function signalsFor(id, a) {
-  const L = [];
-  if (id === "loss") L.push(a.lossHits.length ? `Loss words found: ${uniq(a.lossHits.map(h => h.text.toLowerCase())).join(", ")}. Check they frame a loss for the reader.` : "No loss words found. The copy may still frame a loss without them.");
-  if (id === "sq") L.push(a.sqHits.length ? `Switching or status quo words found: ${uniq(a.sqHits.map(h => h.text.toLowerCase())).join(", ")}.` : "No switching or status quo words found.");
-  if (id === "proof") {
-    L.push(`${a.proofSentences.length} sentence(s) with proof language, ${a.specificProof.length} with a number or named source.`);
-    if (a.vagueProof.length) L.push(`Vague proof: ${uniq(a.vagueProof.map(h => "“" + h.text + "”")).join(", ")}.`);
-  }
-  if (id === "fluency") {
-    if (a.flesch === null) L.push("Not enough text to measure readability.");
-    else {
-      L.push(`Flesch Reading Ease ${a.flesch.toFixed(0)}: ${a.flesch >= 60 ? "plain English" : a.flesch >= 30 ? "fairly difficult to difficult" : "very difficult"}.`);
-      L.push(`Average sentence ${a.avgSentence.toFixed(1)} words. Longest ${a.longest} words.`);
-      if (a.W < 100) L.push(`Short text (${a.W} words). Flesch's method samples 100-word passages, so treat this as a rough guide. It measures ease of reading, not substance: specificity catches empty copy.`);
-    }
-  }
-  if (id === "cta") {
-    L.push(`${a.ctaLines.length} CTA line(s) found, ${a.vagueCtaLines.length} vague.` + (a.vagueCtaLines.length ? ` Vague: ${a.vagueCtaLines.map(l => "“" + l + "”").join(", ")}.` : ""));
-    L.push(a.hasReducer ? "Friction reducer found: a time, cost or risk cue." : "No time, cost or risk cue found near the action.");
-  }
-  if (id === "spec") {
-    L.push(`${a.buzzHits.length} buzzword(s)` + (a.buzzHits.length ? `: ${uniq(a.buzzHits.map(h => h.text.toLowerCase())).join(", ")}.` : "."));
-    L.push(`Numbers: ${a.sharp} sharp, ${a.round} round. Timeframes: ${a.timeframes}. Named places, products or companies: ${a.named}.`);
-  }
-  return L;
-}
+function explain(i){var r=state.cases[state.current].rounds[i],t=r.base*(1+r.mde/100),n=nPerArm(r.base,r.mde);var R=CASES[state.current].rounds[i],src=/^Click rate/.test(R.m)?'<span class="src">Baseline: MailerLite 2025 email benchmarks, business and finance click rate (2.37%). Replace with your own past sends.</span>':'<span class="src">Baseline: assumption. Replace with your own past results for this action.</span>';return src+' Today about <b>'+r.base+'%</b> of partners do this. The test looks for <b>'+(Math.round(t*10)/10)+'%</b> or more with '+'Cell B'+'. To tell a real difference from chance, each cell needs about <b>'+(isFinite(n)?fmt(n):'?')+'</b> partners.';}
+function refreshRound(i){var c=state.current;$("feas"+i).innerHTML=feas(c,i);var v=verdict(c,i),el=$("ver"+i);el.className="verdict "+v.cls;el.innerHTML=v.html;$("round"+i).setAttribute("data-status",state.cases[c].rounds[i].status);renderSummary();renderLog();}
 
-function stamp(v) {
-  return v === null ? `<span class="stamp ln">Not rated</span>` : `<span class="stamp l${v}">${LEVEL_NAMES[v]}</span>`;
-}
+function openCase(c){if(!CASES[c])return;state.current=c;save();renderAll();try{history.replaceState(null,"","#"+c);}catch(e){}}
+state.current="menu";
+$("map").addEventListener("input",function(e){var t=e.target,i=+t.getAttribute("data-i");if(isNaN(i))return;var r=state.cases[state.current].rounds[i];
+ var f=t.getAttribute("data-f"),rf=t.getAttribute("data-r");
+ if(f==="a"||f==="b")r[f]=t.value;else if(f==="base"||f==="mde"){var n=parseFloat(t.value);if(!isNaN(n))r[f]=n;}
+ else if(rf){r.res[rf]=t.value===""?"":parseFloat(t.value);if(r.status==="planned"&&t.value!=="")r.status="running";$("map").querySelector('select[data-i="'+i+'"]').value=r.status;}
+ save();if(f!=="a"&&f!=="b")refreshRound(i);});
+$("map").addEventListener("change",function(e){var t=e.target;if(t.getAttribute("data-f")==="status"){var i=+t.getAttribute("data-i");state.cases[state.current].rounds[i].status=t.value;save();refreshRound(i);}});
+$("markets").addEventListener("input",function(e){var m=e.target.getAttribute("data-mk"),g=e.target.getAttribute("data-sg");if(!m||!g)return;var n=parseFloat(e.target.value);state.cases[state.current].markets[m][g]=isNaN(n)?0:Math.max(0,n);save();renderSummary();renderPool();CASES[state.current].rounds.forEach(function(R,i){$("feas"+i).innerHTML=feas(state.current,i);});});
+$("holdout").addEventListener("input",function(){var n=parseFloat($("holdout").value);if(isNaN(n))return;state.cases[state.current].holdout=Math.max(0,Math.min(30,n));save();renderSummary();renderMarkets();CASES[state.current].rounds.forEach(function(R,i){$("feas"+i).innerHTML=feas(state.current,i);});});
+$("reset").addEventListener("click",function(){var f=fresh();state.cases[state.current]=f.cases[state.current];save();renderAll();});
 
-function renderHeuristics() {
-  const a = state.analysis;
-  const host = $("heuristics");
-  const gaps = HEURISTICS.filter(h => isApplicable(h.id) && (effective(h.id).v === null || effective(h.id).v < 2)).length;
-  $("gapCount").textContent = gaps === 0 ? "No gaps to fix" : `${gaps} ${gaps === 1 ? "gap" : "gaps"} to fix`;
-  $("gapCount").dataset.zero = gaps === 0 ? "true" : "false";
-  host.innerHTML = HEURISTICS.map((h, i) => {
-    if (state.gapsOnly && (!isApplicable(h.id) || effective(h.id).v === 2)) return "";
-    if (!isApplicable(h.id)) {
-      return `
-    <article class="h-card na" data-level="n">
-      <div class="h-num" aria-hidden="true">${pad(i)}</div>
-      <div class="h-main">
-        <div class="h-title"><h3>${esc(h.name)}</h3><span class="stamp ln">Not applicable</span></div>
-        <p class="small">Not scored for ${esc(TYPE_PLURAL[copyType()] || "this copy type")}. Change the copy type to include it.</p>
-      </div>
-      <div class="h-side"></div>
-    </article>`;
-    }
-    const e = effective(h.id);
-    const sug = a.sug[h.id];
-    const ai = state.ai[h.id];
-    const hasSelf = state.self[h.id] !== undefined && state.self[h.id] !== null;
-    const sugText = sug === null || sug === undefined
-      ? (h.id === "loss" || h.id === "sq" ? "No automated suggestion. Rate it yourself or use Rewrite with AI below." : "Add more copy for a suggestion.")
-      : `Rules suggest ${LEVEL_NAMES[sug]}.`;
-    const showFixes = e.v === null || e.v < 2;
-    return `
-    <article class="h-card" data-level="${e.v === null ? "n" : e.v}">
-      <div class="h-num" aria-hidden="true">${pad(i)}</div>
-      <div class="h-main">
-        <div class="h-title"><h3>${esc(h.name)}</h3><div class="row">${stamp(e.v)}${e.src && e.src !== "you" ? `<span class="chip src-${e.src}">${e.src === "auto" ? "rules" : "AI"}</span>` : ""}</div></div>
-        <p class="q">${esc(h.question)}</p>
-        <div class="row"><span class="chip">${esc(h.tier)}</span><span class="chip">${esc(h.mode)}</span></div>
-        <div class="source">${esc(h.source)}</div>
-        <ul class="signals">${signalsFor(h.id, a).map(s => `<li>${esc(s)}</li>`).join("")}</ul>
-      </div>
-      <div class="h-side">
-        <span class="label">Your rating</span>
-        <div class="row">
-          <div class="seg" role="group" aria-label="Rate ${esc(h.name)}">
-            ${[0, 1, 2].map(v => `<button type="button" data-h="${h.id}" data-v="${v}" aria-pressed="${state.self[h.id] === v}">${LEVEL_NAMES[v]}</button>`).join("")}
-          </div>
-          ${hasSelf ? `<button type="button" class="ghost" data-clear="${h.id}">Clear</button>` : ""}
-        </div>
-        <p class="small">${esc(sugText)}</p>
-        ${ai ? `<div class="ai-note"><span class="label">AI: ${LEVEL_NAMES[ai.rating] ?? "?"}</span><span>${esc(ai.reason || "")}</span>${ai.tip ? `<span><strong>Fix:</strong> ${esc(ai.tip)}</span>` : ""}</div>` : ""}
-        ${showFixes
-          ? `<span class="label">Rewrite checklist</span><ul class="checklist">${h.fixes.map(f => `<li><span>${esc(f)}</span></li>`).join("")}</ul>`
-          : `<p class="keep">Present. Keep it in the rewrite.</p>`}
-      </div>
-    </article>`;
-  }).join("");
-}
+renderAll();
 
-let scoreRaf = 0;
-function animateScore(to) {
-  cancelAnimationFrame(scoreRaf);
-  const from = state.shownScore;
-  state.shownScore = to;
-  const el = $("scoreNum");
-  if (reduceMotion || from === to) { el.textContent = to; return; }
-  const t0 = performance.now(), dur = 650;
-  const step = now => {
-    const p = Math.min(1, (now - t0) / dur);
-    const eased = 1 - Math.pow(1 - p, 3);
-    el.textContent = Math.round(from + (to - from) * eased);
-    if (p < 1) scoreRaf = requestAnimationFrame(step);
-  };
-  scoreRaf = requestAnimationFrame(step);
-}
-
-function renderSummary() {
-  const type = copyType();
-  const ids = applicable(type);
-  const ratings = Object.fromEntries(HEURISTICS.map(h => [h.id, effective(h.id).v]));
-  const { score, rated, total, final } = scoreFrom(ratings, state.weights, type);
-  const box = $("scoreBox");
-  box.dataset.final = final ? "true" : "false";
-  $("scoreKind").textContent = final ? "Final" : "Draft";
-  if (rated) animateScore(score); else { cancelAnimationFrame(scoreRaf); $("scoreNum").textContent = "–"; state.shownScore = 0; }
-  const ln = $("langNote");
-  ln.hidden = !state.analysis.nonEnglish;
-  ln.textContent = "This copy does not look like English. The readability formula and word lists are English only, so automated suggestions are off. Rate the heuristics yourself or use Rewrite with AI.";
-  $("marker").style.left = (rated ? score : 0) + "%";
-  const missing = HEURISTICS.filter(h => ids.includes(h.id) && effective(h.id).v === null).map(h => h.name.toLowerCase());
-  const v = $("verdict");
-  if (!rated) { v.textContent = "Add copy to score it."; v.style.color = "var(--muted)"; }
-  else if (!final) { v.textContent = `Draft. Rate ${missing.join(" and ")} to get the final score.`; v.style.color = "var(--muted)"; }
-  else {
-    v.textContent = score >= 75 ? "Ready to test." : score >= 50 ? "Needs a rewrite pass." : "Rewrite before testing.";
-    v.style.color = score >= 75 ? "var(--good)" : score >= 50 ? "var(--warn)" : "var(--bad)";
-  }
-  $("coverage").textContent = `${rated} of ${total} applicable rated`;
-  $("meters").innerHTML = HEURISTICS.map((h, i) => {
-    if (!ids.includes(h.id)) return `<div class="meter na"><span class="n">${pad(i)}</span><span>${esc(h.name)}</span><span class="cells" data-v="n"><i></i><i></i><i></i></span><span class="src">not applicable</span></div>`;
-    const e = effective(h.id);
-    return `<div class="meter"><span class="n">${pad(i)}</span><span>${esc(h.name)}</span><span class="cells" data-v="${e.v === null ? "n" : e.v}" title="${e.v === null ? "Not rated" : LEVEL_NAMES[e.v]}"><i></i><i></i><i></i></span><span class="src">${e.v === null ? "not rated" : LEVEL_NAMES[e.v].toLowerCase() + (e.src === "auto" ? " · rules" : "")}</span></div>`;
-  }).join("");
-  const a = state.analysis;
-  $("choiceFlag").innerHTML = `<b>Flag</b><span><strong>Choice overload, no weight.</strong> ${a.ctaLines.length} CTA line(s) and ${a.listItems} listed option(s) found. The evidence on choice overload is contested, so check that each option earns its place instead of cutting by count.</span>`;
-}
-
-function highlightHTML(text, a) {
-  const marks = [...a.buzzHits, ...a.vagueProof, ...a.vagueCtaHits, ...a.lossHits, ...a.sqHits].sort((x, y) => x.start - y.start || (y.end - y.start) - (x.end - x.start));
-  let out = "", pos = 0;
-  for (const m of marks) {
-    if (m.start < pos) continue;
-    out += esc(text.slice(pos, m.start)) + `<mark class="${m.cls}">${esc(text.slice(m.start, m.end))}</mark>`;
-    pos = m.end;
-  }
-  return out + esc(text.slice(pos));
-}
-
-function activeRewrite() { return state.benchTab === "ai" ? $("aiRewriteInput") : $("rewriteInput"); }
-
-function renderBench() {
-  const orig = $("copyInput").value;
-  $("highlighted").innerHTML = orig.trim() ? highlightHTML(orig, state.analysis) : `<span class="small">Nothing to mark up yet.</span>`;
-  const rw = activeRewrite().value;
-  $("compareHead").textContent = state.benchTab === "ai" ? "AI rewrite" : "My rewrite";
-  const b = analyze(rw, buzzTerms());
-  const a = state.analysis;
-  const rows = [
-    ["Flesch Reading Ease", a.flesch, b.flesch, "up", 0],
-    ["Average sentence length, words", a.avgSentence, b.avgSentence, "down", 1],
-    ["Buzzwords", a.buzzHits.length, b.buzzHits.length, "down", 0],
-    ["Vague proof phrases", a.vagueProof.length, b.vagueProof.length, "down", 0],
-    ["Sharp numbers", a.sharp, b.sharp, "up", 0],
-    ["Timeframes", a.timeframes, b.timeframes, "up", 0],
-    ["Vague CTAs", a.vagueCtaLines.length, b.vagueCtaLines.length, "down", 0],
-    ["Friction reducer present", a.hasReducer ? 1 : 0, b.hasReducer ? 1 : 0, "up", 0]
-  ];
-  const has = rw.trim().length > 0;
-  $("compareBody").innerHTML = rows.map(([label, x, y, dir, dp]) => {
-    const fmt = v => v === null || v === undefined ? "–" : (label.startsWith("Friction") ? (v ? "Yes" : "No") : Number(v).toFixed(dp));
-    let d = "";
-    if (has && x !== null && y !== null && x !== y) {
-      const better = dir === "up" ? y > x : y < x;
-      d = `<span class="${better ? "better" : "worse"}">${better ? "Better" : "Worse"}</span>`;
-    } else if (has) d = `<span class="same">Same</span>`;
-    return `<tr><td>${esc(label)}</td><td class="num">${fmt(x)}</td><td class="num">${has ? fmt(y) : "–"}</td><td>${d}</td></tr>`;
-  }).join("");
-}
-
-function setTab(tab) {
-  state.benchTab = tab;
-  $("tabMine").setAttribute("aria-selected", String(tab === "mine"));
-  $("tabAi").setAttribute("aria-selected", String(tab === "ai"));
-  $("paneMine").hidden = tab !== "mine";
-  $("paneAi").hidden = tab !== "ai";
-  renderBench();
-}
-
-function runAll() {
-  state.analysis = analyze($("copyInput").value, buzzTerms());
-  renderSummary(); renderHeuristics(); renderBench();
-}
-
-/* ---------- Events ---------- */
-state.benchTab = "mine";
-function resetRatings() { state.self = {}; state.ai = {}; $("applyAiBtn").hidden = true; }
-function resetAiRewrite() { $("aiRewriteInput").value = ""; $("aiRefineBtn").hidden = true; }
-$("scoreBtn").addEventListener("click", () => { resetRatings(); runAll(); });
-$("exampleBtn").addEventListener("click", () => { $("copyInput").value = EXAMPLE; $("exampleTag").hidden = false; resetRatings(); resetAiRewrite(); runAll(); });
-$("clearBtn").addEventListener("click", () => { $("copyInput").value = ""; $("rewriteInput").value = ""; resetAiRewrite(); $("exampleTag").hidden = true; resetRatings(); runAll(); });
-$("copyInput").addEventListener("input", () => { $("exampleTag").hidden = $("copyInput").value !== EXAMPLE; });
-$("rewriteInput").addEventListener("input", renderBench);
-$("aiRewriteInput").addEventListener("input", renderBench);
-$("tabMine").addEventListener("click", () => setTab("mine"));
-function setView(gapsOnly) {
-  state.gapsOnly = gapsOnly;
-  $("viewAll").setAttribute("aria-selected", String(!gapsOnly));
-  $("viewGaps").setAttribute("aria-selected", String(gapsOnly));
-  renderHeuristics();
-}
-$("viewAll").addEventListener("click", () => setView(false));
-$("viewGaps").addEventListener("click", () => setView(true));
-$("tabAi").addEventListener("click", () => setTab("ai"));
-$("copyType").addEventListener("change", () => { renderSummary(); renderHeuristics(); });
-$("promoteBtn").addEventListener("click", () => {
-  const el = activeRewrite();
-  if (!el.value.trim()) return;
-  $("copyInput").value = el.value; el.value = "";
-  if (state.benchTab === "ai") $("aiRefineBtn").hidden = true;
-  $("exampleTag").hidden = true; resetRatings(); runAll();
-});
-$("heuristics").addEventListener("click", e => {
-  const b = e.target.closest("button"); if (!b) return;
-  if (b.dataset.h) state.self[b.dataset.h] = Number(b.dataset.v);
-  if (b.dataset.clear) delete state.self[b.dataset.clear];
-  renderSummary(); renderHeuristics();
-});
-
-/* Theme toggle */
-(function () {
-  const root = document.documentElement;
-  const isDark = () => root.dataset.theme ? root.dataset.theme === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
-  const label = () => { $("themeLabel").textContent = isDark() ? "Light mode" : "Dark mode"; };
-  $("themeToggle").addEventListener("click", () => { root.dataset.theme = isDark() ? "light" : "dark"; label(); });
-  label();
-  new MutationObserver(label).observe(root, { attributes: true, attributeFilter: ["data-theme"] });
+/* theme */
+var root=document.documentElement,lbl=document.getElementById("themelabel");
+function tget(){try{return localStorage.getItem("crmlab_theme")}catch(e){return null}}
+function tset(v){try{localStorage.setItem("crmlab_theme",v)}catch(e){}}
+function sysDark(){return window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches}
+function curDark(){var t=root.getAttribute("data-theme");return t?t==="dark":sysDark()}
+function setLabel(){lbl.textContent=curDark()?"Light mode":"Dark mode"}
+var tt=tget();if(tt==="dark"||tt==="light")root.setAttribute("data-theme",tt);
+setLabel();
+document.getElementById("themebtn").addEventListener("click",function(){var n=curDark()?"light":"dark";root.setAttribute("data-theme",n);tset(n);setLabel();});
+if(window.matchMedia)matchMedia("(prefers-color-scheme: dark)").addEventListener("change",setLabel);
 })();
-
-/* ---------- AI rewrite and ratings ---------- */
-const VOICE_RULES = "Plain declarative English, no em dashes, no buzzwords, no invented statistics or customer names (use [placeholder] where a real number or name is needed), and write in the company's own voice (we, our), never about the company in the third person.";
-
-function buildPrompt(copy, type, instruction) {
-  const defs = HEURISTICS.map(h => `- ${h.id} (${h.name}): ${h.question}`).join("\n");
-  return `You are auditing marketing copy against six behavioral heuristics, then rewriting it. Rate each heuristic 0 (missing), 1 (partial) or 2 (present), judged by what the copy actually does, not by keywords.
-
-Heuristics:
-${defs}
-
-Copy type: ${type}
-${type === "Headline" ? "This is a headline only: rate loss, fluency and spec, and set the other three to null.\n" : ""}Copy:
-"""
-${copy}
-"""
-${instruction ? `\nDirection for the rewrite from the user: ${instruction}\n` : ""}
-Return JSON only, no prose, in exactly this shape:
-{"ratings":{"loss":{"rating":0,"reason":"one sentence","tip":"one concrete fix"},"sq":{...},"proof":{...},"fluency":{...},"cta":{...},"spec":{...}},"rewrite":"the rewritten copy"}
-
-The rewrite should fix the gaps you rated 0 or 1. Keep it close to the original length and line structure. Rules for reasons, tips and the rewrite: ${VOICE_RULES}`;
-}
-
-function buildRefinePrompt(copy, current, type, instruction) {
-  return `You are refining a rewrite of marketing copy. Apply the user's direction to the current version. Keep what already works.
-
-Copy type: ${type}
-Original copy:
-"""
-${copy}
-"""
-
-Current version:
-"""
-${current}
-"""
-
-Direction from the user: ${instruction || "Tighten it and make every claim more specific."}
-
-Return JSON only, no prose, in exactly this shape: {"rewrite":"the refined copy"}
-
-Rules: ${VOICE_RULES}`;
-}
-
-function parseJSON(text) {
-  if (typeof text !== "string") return text;
-  const s = text.indexOf("{"), e = text.lastIndexOf("}");
-  if (s < 0 || e < 0) throw new Error("No JSON in the response.");
-  return JSON.parse(text.slice(s, e + 1));
-}
-function setStatus(msg, on) { $("aiStatus").textContent = msg; $("aiStatus").dataset.on = on ? "true" : "false"; }
-function enableAI(on) { $("aiRunBtn").disabled = !on; $("aiRefineBtn").disabled = !on; }
-
-async function detectAI() {
-  if (window.claude && typeof window.claude.use === "function") {
-    try {
-      const sample = await window.claude.use("sample");
-      if (sample) { state.sample = sample; state.ai_mode = "artifact"; enableAI(true); setStatus("AI ready", true); return; }
-    } catch (_) { /* fall through */ }
-  }
-  try {
-    if (!/^https?:$/.test(location.protocol)) throw new Error("no server");
-    const r = await fetch("api/critique", { method: "GET" });
-    if (r.ok) {
-      const info = await r.json();
-      if (info && info.available) {
-        state.ai_mode = "vercel"; enableAI(true);
-        $("passWrap").hidden = !info.passcodeRequired;
-        setStatus(info.passcodeRequired ? "AI ready. Enter the access code." : "AI ready", true);
-        return;
-      }
-    }
-  } catch (_) { /* no server */ }
-  setStatus("AI is not available on this page. Your own rewrite and the checks still work.", false);
-}
-
-async function askAI(prompt, payload) {
-  if (state.ai_mode === "artifact") {
-    if (typeof state.sample.json === "function") return await state.sample.json(prompt);
-    return parseJSON((await state.sample(prompt)).text);
-  }
-  const r = await fetch("api/critique", { method: "POST", headers: { "content-type": "application/json", "x-passcode": $("passcode").value }, body: JSON.stringify(payload) });
-  const body = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(body.error || `The server answered ${r.status}.`);
-  return parseJSON(body.text);
-}
-
-async function runAI(mode) {
-  const copy = $("copyInput").value.trim();
-  if (!copy) { setStatus("Add copy to audit first.", true); return; }
-  const type = $("copyType").selectedOptions[0].textContent;
-  const instruction = $("aiInstr").value.trim();
-  const current = $("aiRewriteInput").value.trim();
-  if (mode === "refine" && !current) mode = "full";
-  enableAI(false);
-  setStatus(mode === "refine" ? "Refining…" : "Rewriting and rating…", true);
-  try {
-    const data = mode === "refine"
-      ? await askAI(buildRefinePrompt(copy, current, type, instruction), { mode, copy, current, type, instruction })
-      : await askAI(buildPrompt(copy, type, instruction), { mode, copy, type, instruction });
-    if (!data || !data.rewrite) throw new Error("The response had no rewrite.");
-    $("aiRewriteInput").value = data.rewrite;
-    $("aiRefineBtn").hidden = false;
-    if (mode === "full" && data.ratings) {
-      state.ai = {};
-      for (const h of HEURISTICS) {
-        const x = data.ratings[h.id];
-        if (x && [0, 1, 2].includes(Number(x.rating))) state.ai[h.id] = { rating: Number(x.rating), reason: x.reason, tip: x.tip };
-      }
-      $("applyAiBtn").hidden = Object.keys(state.ai).length === 0;
-      renderHeuristics();
-    }
-    setStatus(mode === "refine" ? "Refined. Edit it, refine again or score it." : "Done. AI ratings are on each heuristic card.", true);
-    renderBench();
-  } catch (err) {
-    const code = err && err.code;
-    setStatus(code === "not_granted" ? "AI access was not granted for this page." : code === "rate_limited" ? "Too many requests. Wait a minute and try again." : `The AI request failed: ${err && err.message ? err.message : "unknown error"}`, false);
-    if (code === "not_granted") return;
-  }
-  enableAI(true);
-}
-$("aiRunBtn").addEventListener("click", () => runAI("full"));
-$("aiRefineBtn").addEventListener("click", () => runAI("refine"));
-$("applyAiBtn").addEventListener("click", () => {
-  for (const id in state.ai) if (isApplicable(id) && (state.self[id] === undefined || state.self[id] === null)) state.self[id] = state.ai[id].rating;
-  renderSummary(); renderHeuristics();
-});
-
-/* ---------- Init ---------- */
-$("copyInput").value = EXAMPLE;
-runAll();
-detectAI();
 </script>
-</body>
-</html>
+
+</body></html>
